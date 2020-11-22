@@ -11,4 +11,9 @@
 
 - core functionality of the board and game are now working 
 - added player class
-- successfully demonstarted an attack/card flip 
+- successfully demonstrated an attack/card flip 
+
+#### To do next 
+- finish all the attacking routes
+- apply scoring 
+- clean up ability to see state of the board - another dict perhaps 

@@ -87,15 +87,21 @@ class Deck():
 
 
 
+# card opposite filter 
+# if a card is red, the opposite is blue etc 
+#opposite_colour = {'blue':'red',
+#                    'red':'blue'}
+
+
 # each card can occupy a position on the board R1: 0,1,2  R2: 3,4,5  R3: 7,8,9
 # board has become sort of a game class too - but the board's magic I guess :P 
 class Board():
     board_spaces = 9 
     spaces_filled = 0 # when this equals above game is over 
     def __init__(self):
-        self.positions = {'pos_0':['empty',self.pos_0_combat],'pos_1':['empty',self.pos_1_combat],'pos_2':'empty',
-        'pos_3':'empty','pos_4':'empty','pos_5':'empty',
-        'pos_6':'empty','pos_7':'empty','pos_8':'empty'}
+        self.positions = {'pos_0':['empty',self.pos_0_combat],'pos_1':['empty',self.pos_1_combat],'pos_2':['empty',self.pos_2_combat],
+        'pos_3':['empty',self.pos_3_combat],'pos_4':['empty',self.pos_4_combat],'pos_5':['empty','self.pos_5_combat'],
+        'pos_6':['empty','self.pos_6_combat'],'pos_7':['empty','self.pos_7_combat'],'pos_8':['empty','self.pos_8_combat']}
 
     def accept_card(self,position,card):
         ''' card places into position - not very 'oopy' consider revision''' 
@@ -107,23 +113,253 @@ class Board():
     
     def get_positions(self):
         return self.positions
+
+    def state_of_board(self):
+        ''' displays the baord in it's current state'''
+        print(self.positions)
         
     def pos_0_combat(self):
-        if self.positions['pos_1'][0] != 'empty': # then try to attack the card 
-            if self.positions['pos_0'][0].get_west() > self.positions['pos_1'][0].get_east(): # if the number is bigger -> then flip the card 
-    #  TO DO: create a pointer to array containing two colours - apply the opposite of attacking card
-                self.positions['pos_1'][0].set_colour('blue') # flip the card - placeholder red for now 
-                print("0 flipped 1") # debug checks 
-    # TO DO: adjust score for red/blue player 
+        ''' 0 fights 1 and 3 '''
+        # fight 1 
+        if self.positions['pos_1'][0] != 'empty': 
+            if self.positions['pos_1'][0].get_colour() != self.positions['pos_0'][0].get_colour(): # then try to attack the card 
+                if self.positions['pos_0'][0].get_west() > self.positions['pos_1'][0].get_east(): # if the number is bigger -> then flip the card 
+        #  TO DO: create a pointer to array containing two colours - apply the opposite of attacking card
+                    print("0 fighting 1")
+                    self.positions['pos_1'][0].set_colour(self.positions['pos_0'][0].get_colour()) # flip the card to attacking cards colour 
+                    print("0 flipped 1") # debug checks 
+        # TO DO: adjust score for red/blue player 
 
-        if self.positions['pos_4'] != 'empty': 
-            if self.positions['pos_0'][0].get_south() > self.positions['pos_3'][0].get_north():
-                self.position['pos_3'].set_colour('red') # again opposite of placed card 
-                print("0 flipped 3") # to colour
+        # fight 3 
+        if self.positions['pos_3'][0] != 'empty':
+            if self.positions['pos_3'][0].get_colour() != self.positions['pos_0'][0].get_colour(): 
+                if self.positions['pos_0'][0].get_south() > self.positions['pos_3'][0].get_north():
+                    print("0 fighting 3")
+                    self.position['pos_3'].set_colour(self.positions['pos_0'][0].get_colour()) # again opposite of placed card 
+                    print("0 flipped 3") # to colour
 
     def pos_1_combat(self):
-        if self.positions['pos_0'] != 'empty':
-            print("Placeholder")
+        ''' 1 fights 0, 4 and 2'''
+        # fight 0
+        if self.positions['pos_0'][0] != 'empty':
+            if self.positions['pos_0'][0].get_colour() != self.positions['pos_1'][0].get_colour():
+                if self.positions['pos_1'][0].get_west() > self.positions['pos_0'][0].get_east():
+                    print("1 fighting 0")
+                    self.positions['pos_0'][0].set_colour(self.positions['pos_1'][0].get_colour()) # flip the card to attacking cards colour 
+                    print("1 flipped 0")
+        # fight 2
+        if self.positions['pos_2'][0] != 'empty':
+            if self.positions['pos_2'][0].get_colour() != self.positions['pos_1'][0].get_colour():
+                if self.positions['pos_1'][0].get_east() > self.positions['pos_2'][0].get_west():
+                    print("1 fighting 2")
+                    self.positions['pos_2'][0].set_colour(self.positions['pos_1'][0].get_colour()) # flip the card to attacking cards colour 
+                    print("1 flipped 2")
+
+        # fight 4 
+        if self.positions['pos_4'][0] != 'empty':
+            if self.positions['pos_4'][0].get_colour() != self.positions['pos_1'][0].get_colour():
+                if self.positions['pos_1'][0].get_south() > self.positions['pos_4'][0].get_north():
+                    print("1 fighting 4")
+                    self.positions['pos_4'][0].set_colour(self.positions['pos_1'][0].get_colour()) # flip the card to attacking cards colour 
+                    print("1 flipped 4")
+
+    def pos_2_combat(self):
+        ''' 2 fights 5 and 1'''
+        # fight 1
+        if self.positions['pos_1'][0] != 'empty':
+            if self.positions['pos_1'][0].get_colour() != self.positions['pos_2'][0].get_colour():
+                if self.positions['pos_2'][0].get_west() > self.positions['pos_1'][0].get_east(): 
+                    print("2 fighting 1")
+                    self.positions['pos_1'][0].set_colour(self.positions['pos_2'][0].get_colour()) # flip the card to attacking cards colour
+        # fight 5 
+        if self.positions['pos_5'][0] != 'empty': 
+            if self.positions['pos_5'][0].get_colour() != self.positions['pos_2'][0].get_colour():
+                if self.positions['pos_2'][0].get_south() > self.positions['pos_5'][0].get_north():
+                    self.positions['pos_5'][0].set_colour(self.positions['pos_2'][0].get_colour()) # flip the card to attacking cards colour
+
+    def pos_3_combat(self):
+        ''' 3 fights 0,4 and 6'''
+        # fight 0 
+        if self.positions['pos_0'][0] != 'empty':
+            if self.positions['pos_0'][0].get_colour() != self.positions['pos_3'][0].get_colour():
+                if self.positions['pos_3'][0].get_north() > self.positions['pos_0'][0].get_south():
+                    print("3 fighting 0")
+                    self.positions['pos_0'][0].set_colour(self.positions['pos_3'][0].get_colour()) # flip the card to attacking cards colour
+                    print("3 flipped 0")
+
+        #fight 4 
+        if self.positions['pos_4'][0] != 'empty':
+            if self.positions['pos_4'][0].get_colour() != self.positions['pos_3'][0].get_colour():
+                if self.positions['pos_3'][0].get_east() > self.positions['pos_4'][0].get_west():
+                    print("3 fighting 4")
+                    self.positions['pos_4'][0].set_colour(self.positions['pos_3'][0].get_colour()) # flip the card to attacking cards colour
+                    print("3 flipped 4")
+        
+        # fight 6 
+        if self.positions['pos_6'][0] != 'empty':
+            if self.positions['pos_6'][0].get_colour() != self.positions['pos_3'][0].get_colour():
+                if self.positions['pos_3'][0].get_south() > self.positions['pos_6'][0].get_north():
+                    print("3 fighting 6")
+                    self.positions['pos_6'][0].set_colour(self.positions['pos_3'][0].get_colour()) # flip the card to attacking cards colour
+                    print("3 flipped 6")
+
+    def pos_4_combat(self):
+        ''' 4 fights 1,3,5 and 7 '''
+        # fight 1 
+        if self.positions['pos_1'][0] != 'empty':
+            if self.positions['pos_1'][0].get_colour() != self.positions['pos_4'][0].get_colour():
+                if self.positions['pos_4'][0].get_north() > self.positions['pos_1'][0].get_south():
+                    print("4 fighting 1")
+                    self.positions['pos_1'][0].set_colour(self.positions['pos_4'][0].get_colour()) # flip the card to attacking cards colour
+                    print("4 flipped 1")
+        # fight 3 
+        if self.positions['pos_3'][0] != 'empty':
+            if self.positions['pos_3'][0].get_colour() != self.positions['pos_4'][0].get_colour():
+                if self.positions['pos_4'][0].get_west() > self.positions['pos_3'][0].get_east():
+                    print("4 fighting 3")
+                    self.positions['pos_3'][0].set_colour(self.positions['pos_4'][0].get_colour()) # flip the card to attacking cards colour
+                    print("4 flipped 3")
+
+        # fight 5 
+        if self.positions['pos_5'][0] != 'empty':
+            if self.positions['pos_5'][0].get_colour() != self.positions['pos_4'][0].get_colour():
+                if self.positions['pos_4'][0].get_east() > self.positions['pos_5'][0].get_west():
+                    print("4 fighting 5")
+                    self.positions['pos_5'][0].set_colour(self.positions['pos_4'][0].get_colour()) # flip the card to attacking cards colour
+                    print("4 flipped 5")
+
+        # fight 7 
+        if self.positions['pos_7'][0] != 'empty':
+            if self.positions['pos_7'][0].get_colour() != self.positions['pos_4'][0].get_colour():
+                if self.positions['pos_4'][0].get_south() > self.positions['pos_7'][0].get_north():
+                    print("4 fighting 7")
+                    self.positions['pos_7'][0].set_colour(self.positions['pos_4'][0].get_colour()) # flip the card to attacking cards colour
+                    print("4 flipped 7") 
+
+
+    def pos_5_combat(self):
+        ''' 5 fights 2,4 and 8 '''
+        # fight 2 
+        if self.positions['pos_2'][0] != 'empty':
+            if self.positions['pos_2'][0].get_colour() != self.positions['pos_5'][0].get_colour():
+                if self.positions['pos_5'][0].get_north() > self.positions['pos_2'][0].get_south():
+                    print("5 fighting 2")
+                    self.positions['pos_2'][0].set_colour(self.positions['pos_5'][0].get_colour()) # flip the card to attacking cards colour
+                    print("5 flipped 2")
+        
+        # fight 4 
+        if self.positions['pos_4'][0] != 'empty':
+            if self.positions['pos_4'][0].get_colour() != self.positions['pos_5'][0].get_colour():
+                if self.positions['pos_5'][0].get_west() > self.positions['pos_4'][0].get_east():
+                    print("5 fighting 4")
+                    self.positions['pos_4'][0].set_colour(self.positions['pos_5'][0].get_colour()) # flip the card to attacking cards colour
+                    print("5 flipped 4")
+
+        # fight 8 
+        if self.positions['pos_8'][0] != 'empty':
+            if self.positions['pos_8'][0].get_colour() != self.positions['pos_5'][0].get_colour():
+                if self.positions['pos_5'][0].get_south() > self.positions['pos_4'][0].get_north():
+                    print("5 fighting 8")
+                    self.positions['pos_8'][0].set_colour(self.positions['pos_5'][0].get_colour()) # flip the card to attacking cards colour
+                    print("5 flipped 8")
+
+    def pos_6_combat(self):
+        ''' 6 fights 3 and 7 '''
+        # fight 3 
+        if self.positions['pos_3'][0] != 'empty':
+            if self.positions['pos_3'][0].get_colour() != self.positions['pos_6'][0].get_colour():
+                if self.positions['pos_6'][0].get_north() > self.positions['pos_4'][0].get_south():
+                    print("6 fighting 3")
+                    self.positions['pos_3'][0].set_colour(self.positions['pos_6'][0].get_colour()) # flip the card to attacking cards colour
+                    print("6 flipped 3")
+
+        # fight 7 
+        if self.positions['pos_7'][0] != 'empty':
+            if self.positions['pos_7'][0].get_colour() != self.positions['pos_6'][0].get_colour():
+                if self.positions['pos_6'][0].get_east() > self.positions['pos_7'][0].get_west():
+                    print("6 fighting 7")
+                    self.positions['pos_7'][0].set_colour(self.positions['pos_6'][0].get_colour()) # flip the card to attacking cards colour
+                    print("6 flipped 7")
+
+    def pos_7_combat(self):
+        '''7 fights 6, 4 and 8 '''
+        # fight 6 
+        if self.positions['pos_6'][0] != 'empty':
+            if self.positions['pos_6'][0].get_colour() != self.positions['pos_7'][0].get_colour():
+                if self.positions['pos_7'][0].get_west() > self.positions['pos_6'][0].get_east():
+                    print("7 fighting 6")
+                    self.positions['pos_6'][0].set_colour(self.positions['pos_7'][0].get_colour()) # flip the card to attacking cards colour
+                    print("7 flipped 6")
+        # fight 4
+        if self.positions['pos_4'][0] != 'empty':
+            if self.positions['pos_4'][0].get_colour() != self.positions['pos_7'][0].get_colour():
+                if self.positions['pos_7'][0].get_north() > self.positions['pos_4'][0].get_south():
+                    print("7 fighting 4")
+                    self.positions['pos_4'][0].set_colour(self.positions['pos_7'][0].get_colour()) # flip the card to attacking cards colour
+                    print("7 flipped 4")
+
+        # fight 8 
+        if self.positions['pos_8'][0] != 'empty':
+            if self.positions['pos_8'][0].get_colour() != self.positions['pos_7'][0].get_colour():
+                if self.positions['pos_7'][0].get_east() > self.positions['pos_8'][0].get_west():
+                    print("7 fighting 8")
+                    self.positions['pos_8'][0].set_colour(self.positions['pos_7'][0].get_colour()) # flip the card to attacking cards colour
+                    print("7 flipped 8")
+
+    def pos_8_combat(self):
+        '''8 fights 7 and 5 '''
+        # fight 7 
+        if self.positions['pos_7'][0] != 'empty':
+            if self.positions['pos_7'][0].get_colour() != self.positions['pos_8'][0].get_colour():
+                if self.positions['pos_8'][0].get_west() > self.positions['pos_7'][0].get_east():
+                    print("8 fighting 7")
+                    self.positions['pos_7'][0].set_colour(self.positions['pos_8'][0].get_colour()) # flip the card to attacking cards colour
+                    print("8 flipped 7")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# test all
+# define scoring 
+
+
+
+        
+# is it going to be an issue where the check is a compound check? ie a position wont have an attribute until a card is placed there 
+# could split it onto different lines 
+
+
     
 # check if it changes colour 
        
@@ -147,85 +383,67 @@ red_player = Player('red')
 deck_test.deal_to_player(blue_player)
 deck_test.deal_to_player(red_player)
 
-for card in blue_player.inventory:
-    print(card.get_colour())
-    card.show_compass_values()
+#for card in blue_player.inventory:
+#    print(card.get_colour())
+#    card.show_compass_values()
 
-for card in red_player.inventory:
-    print(card.get_colour()) # colours correct
-    card.show_compass_values() # shows cards values on the poles 
+#for card in red_player.inventory:
+#    print(card.get_colour()) # colours correct
+#    card.show_compass_values() # shows cards values on the poles 
 
 # test if our attack method works? 
 
 # initalise board 
-
 board = Board()
+
+
+# checks - max out blue card stats - minimise red card stats and test all combat
 # max out the attacking poles stats 
 print("Blue card before")
 blue_player.inventory[0].show_compass_values()
 blue_player.inventory[0].set_west(9)
 blue_player.inventory[0].set_south(9)
+blue_player.inventory[0].set_north(9)
+blue_player.inventory[0].set_east(9)
 print("Blue card after")
 blue_player.inventory[0].show_compass_values()
 
 
-# these should be defeated by blue 
+# red card - these should be defeated by blue - minimise stats for debugging 
 print("red before")
 red_player.inventory[1].show_compass_values()
-red_player.inventory[1].set_east(8)
+red_player.inventory[1].set_east(1)
+red_player.inventory[1].set_north(1)
+red_player.inventory[1].set_south(1)
+red_player.inventory[1].set_west(1)
+
 print("red after")
 red_player.inventory[1].show_compass_values()
 
 
-
-#red_player.inventory[3].set_north(8)
-
+######### pos_0 attacking pos 1 checks
 # place red card [1] on pos_1 
-print(board.get_positions())
-board.accept_card('pos_1',red_player.inventory[1])
-print(board.get_positions())
+#print(board.get_positions())
+#board.accept_card('pos_1',red_player.inventory[1])
+#print(board.get_positions())
 
-print(board.get_positions()['pos_1'][0].get_colour()) # it's red 
+#print("pos1 card colour")
+#print(board.get_positions()['pos_1'][0].get_colour()) # it's red 
 
 # let's attack it 
 
-board.accept_card('pos_0',blue_player.inventory[0])
+#board.accept_card('pos_0',blue_player.inventory[0])
+
+#print("pos 1 card colour after fight")
+#print(board.get_positions()['pos_1'][0].get_colour()) # blue now - excellent - hardcoded but still great work!
 
 
-print(board.get_positions()['pos_1'][0].get_colour()) # blue now - excellent - hardcoded but still great work!
+#board.state_of_board()
 
+######### pos_0 attacking pos_3 checks
 
-
-
-#deck_test.cards[0].set_colour('blue')
-#print(deck_test.cards[0].get_colour())
-
-# check if board can accept cards into positions on the board 
-#board_test = Board()
-#board_test.accept_card('pos_0',deck_test.cards[0])
-#print("board test")
-#print(board_test.positions['pos_0'][0].get_colour())
-#print(board_test.get_positions())
-
-# game logic 
-# if a space is empty a card can be placed in that position
-# # if a player (blue) has a higher number next to a lower number of opponent (red) card 
-# --> then you flip that card and this adds to that players (initially 5-5) 
-
-# next we need to simulate the logic of turning/defeating cards on the board 
-
-# if card in -> 
-# pos 0 north and west are neutral/0 , pos 1 - north neutral , pos 2 - north and east - neutral 
-# pos 3 west neutral , pos 4 mothing, pos 5 east neutral 
-# pos 6 south and west neutral, 7 south neutral, 8 south and east neutral 
-
-# if neighbour colour != same and touching pole > neighbour pole - 
-    # card.colur change 
-
-# how do i program neighbours/ poles? 
-
-# if pos is empty - then you can place card 
-# have a method for each position ... 
-# so you could have a list card holder and then the function for that position 
-# check for neighbours when you place card  
+# place red card [1] on pos_3 
+#print(board.get_positions())
+#board.accept_card('pos_3',red_player.inventory[1])
+#print(board.get_positions())
 
