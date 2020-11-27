@@ -87,6 +87,7 @@ class Deck():
 
 
 
+
 # card opposite filter 
 # if a card is red, the opposite is blue etc 
 #opposite_colour = {'blue':'red',
@@ -119,7 +120,23 @@ class Board():
 
     def state_of_board(self):
         ''' displays the baord in it's current state'''
-        print(self.positions)
+        #print(self.positions)
+        positions=self.positions
+
+        keys = positions.keys()
+
+        for key in keys:
+            
+            card = positions[key][0]
+            if card == 'empty':
+                print(key,card, end=" ")
+            else:
+                print(key, end=" ")
+                card.show_compass_values()
+            if key in ['pos_2','pos_5']:
+                print()
+            
+
         
     def pos_0_combat(self):
         ''' 0 fights 1 and 3 '''
@@ -331,10 +348,15 @@ class Board():
                     print("8 flipped 5")
 
 
+class CPU():
+    '''CPU class which play versus a player '''
+    
+
+
 
 # test all - done all combat works! 
 # define scoring 
-# introduce ability to view state of board visually 
+# introduce ability to view state of board visually - sort of better 
 # create ai 
 
 
@@ -469,3 +491,4 @@ print(board.get_positions()['pos_7'][0].get_colour()) # it's red
 #print(board.get_positions()['pos_7'][0].get_colour()) # it's red 
 
 
+board.state_of_board()
