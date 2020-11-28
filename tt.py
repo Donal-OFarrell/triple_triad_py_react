@@ -49,9 +49,9 @@ class Card():
         print(self.compass_values)
 
 class Player():
-    '''Represents a player of Triple Triad (Squall v AI eventually) '''
-    def __init__(self,colour):
-        self.colour = colour
+    '''Player class AKA Squall - (i.e. the player playing vs cpu)'''
+    colour = 'blue'
+    def __init__(self):
         self.inventory = [] 
 
     def get_player_colour(self):
@@ -80,7 +80,7 @@ class Deck():
             else:
                 self.cards[i].set_colour('red')
 
-    def deal_to_player(self,player): # pass player object to the class
+    def deal_to_player(self,player): # pass player/AI object to the class
         for card in self.cards:
             if player.get_player_colour() == card.get_colour():
                 player.add_to_inventory(card)
@@ -117,6 +117,9 @@ class Board():
 
     def get_positions(self):
         return self.positions
+
+    def get_spaces_filled(self):
+        return self.spaces_filled
 
     def state_of_board(self):
         ''' displays the baord in it's current state'''
@@ -350,7 +353,45 @@ class Board():
 
 class CPU():
     '''CPU class which play versus a player '''
+    colour = 'red'
+
+    def __init__(self):
+        self.inventory=[]
+
+    def add_to_inventory(self,card):
+        self.inventory.append(card)
+
+    def get_player_colour(self):
+        return self.colour
+
+    def make_move(self,board):
+        ''' this is the CPU brain '''
+        # needs to read state of board 
+        board_in_play = board.get_positions()
+
+        # also needs to assess it's cards 
     
+        # then needs to act accordingly 
+
+        # if the board is empty - play a defensive opener
+        empty = board.get_spaces_filled()
+
+        if empty == 0:
+            print("Playing defensive card")
+            # limit this to the 4 corners 
+
+        # from board in play define the available positions 
+        
+
+
+
+    
+
+    
+    
+  
+    
+
 
 
 
@@ -384,8 +425,8 @@ deck_test = Deck()
 #    j +=1 
 
 # define some players 
-blue_player = Player('blue')
-red_player = Player('red')
+blue_player = Player()
+red_player = CPU()
 
 deck_test.deal_to_player(blue_player)
 deck_test.deal_to_player(red_player)
