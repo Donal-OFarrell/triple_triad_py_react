@@ -48,6 +48,13 @@ class Card():
     def show_compass_values(self):
         print(self.compass_values)
 
+    def return_compass_values(self):
+        return self.compass_values 
+
+    def card_power(self):
+        ''' defines the power of a card by summing the poles '''
+        return self.north + self.south + self.east + self.west 
+
 class Player():
     '''Player class AKA Squall - (i.e. the player playing vs cpu)'''
     colour = 'blue'
@@ -62,7 +69,6 @@ class Player():
 
     def get_inventory(self):
         return self.inventory
-
 
 
 # deck class will generate the deck 
@@ -138,7 +144,29 @@ class Board():
                 card.show_compass_values()
             if key in ['pos_2','pos_5']:
                 print()
-            
+    
+    def ret_board_in_play(self):
+        ''' returns dictionary structure with positions and their occupancies '''
+        positions=self.positions
+
+        board_dict = {}
+
+        keys = positions.keys()
+
+        for key in keys:
+            card = positions[key][0]
+            if card == 'empty':
+                board_dict[key] = ['no_card','no_values']
+            else:
+                board_dict[key] = [card,card.return_compass_values()]
+
+        return board_dict 
+
+        
+        
+
+
+
 
         
     def pos_0_combat(self):
@@ -352,45 +380,111 @@ class Board():
 
 
 class CPU():
-    '''CPU class which play versus a player '''
+    '''CPU class which play versus a player 
+    we'll need a play_defense() method also'''
     colour = 'red'
 
     def __init__(self):
         self.inventory=[]
+        self.attack_map= {'pos_0':'pos_0_attack', 
+                      'pos_1':'pos_1_attack',
+                      'pos_2':'pos_2_attack',
+                      'pos_3':'pos_3_attack',
+                      'pos_4':'pos_4_attack',
+                      'pos_5':'pos_5_attack',
+                      'pos_6':'pos_6_attack',
+                      'pos_7':'pos_7_attack',
+                      'pos_8':'pos_8_attack'}
+        self.board_status = {}
+        self.spaces_in_play={}
+        self.occupied_spaces={}
+        
 
     def add_to_inventory(self,card):
         self.inventory.append(card)
 
+    def get_inventory(self):
+        return self.inventory 
+
+    def show_inventory(self):
+        print (self.inventory)
+
     def get_player_colour(self):
         return self.colour
 
-    def make_move(self,board):
-        ''' this is the CPU brain '''
-        # needs to read state of board 
-        board_in_play = board.get_positions()
+    def assess_board(self,board):
+        self.board_status = board.ret_board_in_play()
+        print()
+        print ("Printing board in play from CPU class")
+        print(self.board_status)
 
-        # also needs to assess it's cards 
-    
-        # then needs to act accordingly 
+
 
         # if the board is empty - play a defensive opener
         empty = board.get_spaces_filled()
 
-        if empty == 0:
+        if empty == 0: # need to address this 
             print("Playing defensive card")
             # limit this to the 4 corners 
 
-        # from board in play define the available positions 
+        for key,value in self.board_status.items():
+            if value[1] == 'no_values':
+                self.spaces_in_play[key] = value
+            else:
+                self.occupied_spaces[key] = value
+
+        print()
+        print("Available spaces from CPU class")
+        print(self.spaces_in_play)
+        print("Unavailable spaces from CPU class")
+        print(self.occupied_spaces)
+
+
+    def make_move(self,board):
+        ''' this is the CPU brain '''
+        # needs to read state of board 
+        self.assess_board(board)
+
+
+        attack_options = self.spaces_in_play.keys()
+
+        print("looping through attack options")
+        for option in attack_options: 
+            print(self.attack_map[option])
+
+    def pos_0_attack(self):
+        ''' access board as attributes'''
+        # need to loop through inventory
+        # need a data strcuture to store possible moves 
+         
+        #for inv in self.inventory:
+            
+            
+
+
         
 
 
 
-    
+        
 
-    
-    
-  
-    
+        # search for attacks 
+        # based on our inventory
+        # extra methods? 
+        # # we need to define all available moves probably  
+
+        # for cards in inventory - ordered by 'power' (sum of poles) - optional later 
+        # loop through available positions 
+        # if a flip is available - track or take it 
+
+        # define combat for each position 
+        # loop through with each card and look for takes
+        # i think you need the actual cards rather than a reference to them to use their methods    
+
+     
+        
+
+
 
 
 
@@ -533,3 +627,7 @@ print(board.get_positions()['pos_7'][0].get_colour()) # it's red
 
 
 board.state_of_board()
+
+print(board.ret_board_in_play())
+
+red_player.make_move(board)
