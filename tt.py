@@ -484,7 +484,7 @@ class CPU():
             if self.board_status['pos_3'][0] != 'empty' and double_check: # if the double check has taken place don't run this
                 if self.board_status['pos_3'][0].get_colour() != self.board_status['pos_0'][0].get_colour(): 
                     if self.board_status['pos_0'][0].get_south() > self.board_status['pos_3'][0].get_north():
-                        print("Double case for pos 0 with ", inv_card_index)
+                        print("0 versus 3 is a flip with ", inv_card_index)
                         self.possible_moves['pos_0'] = {inv_card_index:[inv_card_power,1]}                
 
                     
