@@ -398,6 +398,7 @@ class CPU():
         self.board_status = {}
         self.spaces_in_play={}
         self.occupied_spaces={}
+        self.possible_moves = {} #{'pos_0':{inv_0:[card power as int,score as int]}}
         
 
     def add_to_inventory(self,card):
@@ -452,14 +453,48 @@ class CPU():
         for option in attack_options: 
             print(self.attack_map[option])
 
+        # then here assess the possible moves and pick the best - ie produces flip with weakest card 
+
+        # if nothing play defensive 
+
     def pos_0_attack(self):
         ''' access board as attributes'''
         # need to loop through inventory
         # need a data strcuture to store possible moves 
-         
-        #for inv in self.inventory:
-            
-            
+        double_check = False
+        for inv_card in self.inventory:
+            inv_card_power = inv_card.card_power() # assses cards power/score 
+            inv_card_index = self.inventory.index(inv_card)# assign an index to card being assessed 
+            # pos 1 check with double case 
+            if self.board_status['pos_1'][0] != 'empty':
+                if self.board_status['pos_1'][0].get_colour() != self.board_status['pos_0'][0].get_colour():
+                    if self.board_status['pos_0'][0].get_west() > self.board_status['pos_1'][0].get_east():
+                        print("0 versus 1 is a flip with ",inv_card_index)
+                        # here we assign the value to possible_moves 
+                        self.possible_moves['pos_0'] = {inv_card_index:[inv_card_power,1]} # how to increment score? 
+                        # another if statement here for the double case? 
+                        if self.board_status['pos_3'][0] != 'empty':
+                            double_check = True
+                            if self.board_status['pos_3'][0].get_colour() != self.board_status['pos_0'][0].get_colour(): 
+                                if self.board_status['pos_0'][0].get_south() > self.board_status['pos_3'][0].get_north():
+                                    print("Double case for pos 0 with ", inv_card_index)
+                                    self.possible_moves['pos_0'] = {inv_card_index:[inv_card_power,2]}
+                                    
+
+            if self.board_status['pos_3'][0] != 'empty' and double_check: # if the double check has taken place don't run this
+                if self.board_status['pos_3'][0].get_colour() != self.board_status['pos_0'][0].get_colour(): 
+                    if self.board_status['pos_0'][0].get_south() > self.board_status['pos_3'][0].get_north():
+                        print("Double case for pos 0 with ", inv_card_index)
+                        self.possible_moves['pos_0'] = {inv_card_index:[inv_card_power,1]}                
+
+                    
+                        
+
+            # then a solitary check here for pos 3 check 
+
+                                   
+
+
 
 
         
