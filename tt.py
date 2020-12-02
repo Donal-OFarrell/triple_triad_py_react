@@ -381,7 +381,8 @@ class Board():
 
 class CPU():
     '''CPU class which play versus a player 
-    we'll need a play_defense() method also'''
+    we'll need a play_defense() method also
+    for this need to have a score for the exposed edges'''
     colour = 'red'
 
     def __init__(self):
@@ -480,7 +481,7 @@ class CPU():
                                     print("Double case for pos 0 with ", inv_card_index)
                                     self.possible_moves['pos_0'] = {inv_card_index:[inv_card_power,2]}
                                     
-
+            # then a solitary check here for pos 3 check
             if self.board_status['pos_3'][0] != 'empty' and double_check: # if the double check has taken place don't run this
                 if self.board_status['pos_3'][0].get_colour() != self.board_status['pos_0'][0].get_colour(): 
                     if self.board_status['pos_0'][0].get_south() > self.board_status['pos_3'][0].get_north():
@@ -490,7 +491,7 @@ class CPU():
                     
                         
 
-            # then a solitary check here for pos 3 check 
+             
 
                                    
 
