@@ -387,7 +387,7 @@ class CPU():
 
     def __init__(self):
         self.inventory=[]
-        self.attack_map= {'pos_0':'pos_0_attack', 
+        self.attack_map= {'pos_0':self.pos_0_attack, 
                       'pos_1':'pos_1_attack',
                       'pos_2':'pos_2_attack',
                       'pos_3':'pos_3_attack',
@@ -454,7 +454,14 @@ class CPU():
         for option in attack_options: 
             print(self.attack_map[option])
 
+        # manually invoke pos_0_attack
+        print("Manually invoking pos 0 attack")
+        self.pos_0_attack()
+
+
         # then here assess the possible moves and pick the best - ie produces flip with weakest card 
+        print("printing possible moves")
+        print(self.possible_moves)
 
         # if nothing play defensive 
 
@@ -467,75 +474,100 @@ class CPU():
             inv_card_power = inv_card.card_power() # assses cards power/score 
             inv_card_index = self.inventory.index(inv_card)# assign an index to card being assessed 
             # pos 1 check with double case 
+            print("first check")
             if self.board_status['pos_1'][0] != 'empty':
-                if self.board_status['pos_1'][0].get_colour() != self.board_status['pos_0'][0].get_colour():
-                    if self.board_status['pos_0'][0].get_west() > self.board_status['pos_1'][0].get_east():
+                if self.board_status['pos_1'][0].get_colour() != inv_card.get_colour():
+                    print("colour check passed")
+                    if inv_card.get_east() > self.board_status['pos_1'][0].get_west():
                         print("0 versus 1 is a flip with ",inv_card_index)
                         # here we assign the value to possible_moves 
                         self.possible_moves['pos_0'] = {inv_card_index:[inv_card_power,1]} # how to increment score? 
                         # another if statement here for the double case? 
                         if self.board_status['pos_3'][0] != 'empty':
+                            print("nested boolean")
                             double_check = True
-                            if self.board_status['pos_3'][0].get_colour() != self.board_status['pos_0'][0].get_colour(): 
-                                if self.board_status['pos_0'][0].get_south() > self.board_status['pos_3'][0].get_north():
+                            if self.board_status['pos_3'][0].get_colour() != inv_card.get_colour(): 
+                                if inv_card.get_south() > self.board_status['pos_3'][0].get_north():
                                     print("Double case for pos 0 with ", inv_card_index)
                                     self.possible_moves['pos_0'] = {inv_card_index:[inv_card_power,2]}
                                     
             # then a solitary check here for pos 3 check
-            if self.board_status['pos_3'][0] != 'empty' and double_check: # if the double check has taken place don't run this
-                if self.board_status['pos_3'][0].get_colour() != self.board_status['pos_0'][0].get_colour(): 
-                    if self.board_status['pos_0'][0].get_south() > self.board_status['pos_3'][0].get_north():
+            if self.board_status['pos_3'][0] != 'empty' and double_check == False: # if the double check has taken place don't run this
+                if self.board_status['pos_3'][0].get_colour() != inv_card.get_colour(): 
+                    if inv_card.get_south() > self.board_status['pos_3'][0].get_north():
                         print("0 versus 3 is a flip with ", inv_card_index)
-                        self.possible_moves['pos_0'] = {inv_card_index:[inv_card_power,1]}                
+                        self.possible_moves['pos_0'] = {inv_card_index:[inv_card_power,1]} 
 
-                    
-                        
+    def pos_1_attack(self):
+        '''AI actions for pos_1 '''
+        for inv_card in self.inventory:
+            inv_card_power = inv_card.card_power() # assses cards power/score
+            inv_card_index = self.inventory.index(inv_card)# assign an index to card being assessed 
+            four_check = False # control boolean to prevent repeat checks on position 4 
+            two_check = False # control boolean to prevent repeat checks on position 2
 
-             
+            # pos 0 check 
+            if self.board_status['pos_0'][0] != 'empty': # card present 
+                if self.board_status['pos_0'][0].get_colour() != self.board_status['pos_1'][0].get_colour(): # colour is opposite - fight! 
+                    if self.board_status['pos_1'][0].get_west() > self.board_status['pos_0'][0].get_east():
+                        print("1 versus 0 is a flip with ",inv_card_index)
+                        # here we assign the value to possible_moves 
+                        self.possible_moves['pos_1'] = {inv_card_index:[inv_card_power,1]} # how to increment score? 
+                        # another if statement here for the double case for pos 4 
 
-                                   
+                        # pos 4 - double check
+                        if self.board_status['pos_4'][0] != 'empty': # card present
+                            four_check = True
+                            if self.board_status['pos_4'][0].get_colour() != self.board_status['pos_1'][0].get_colour(): 
+                                if self.board_status['pos_1'][0].get_south() > self.board_status['pos_4'][0].get_north():
+                                    # here we assign the value to possible_moves 
+                                    print("1 versus 4 is a double flip with ",inv_card_index)
+                                    self.possible_moves['pos_1'] = {inv_card_index:[inv_card_power,2]} # how to increment score? 
+                                    
+                                    # another if statement here for the triple case?
+                                    if self.board_status['pos_2'][0] != 'empty': # card present
+                                        two_check = True
+                                        if self.board_status['pos_2'][0].get_colour() != self.board_status['pos_1'][0].get_colour():
+                                            if self.board_status['pos_1'][0].get_east() > self.board_status['pos_2'][0].get_east():
+                                                # here we assign the value to possible_moves 
+                                                print("1 versus 2 is a triple flip with ",inv_card_index)
+                                                self.possible_moves['pos_1'] = {inv_card_index:[inv_card_power,3]} # how to increment score?
 
+                        # pos 2 alternate double check
+                        if self.board_status['pos_2'][0] != 'empty': # card present
+                            two_check = True 
+                            if self.board_status['pos_2'][0].get_colour() != self.board_status['pos_1'][0].get_colour():
+                                if self.board_status['pos_1'][0].get_east() > self.board_status['pos_2'][0].get_east():
+                                    # here we assign the value to possible_moves 
+                                    print("1 versus 2 is a double flip with ",inv_card_index)
+                                    self.possible_moves['pos_1'] = {inv_card_index:[inv_card_power,2]} # how to increment score? 
 
+            # pos 4 check
+            if self.board_status['pos_4'][0] != 'empty' and four_check==False: # card present
+                four_check=True
+                if self.board_status['pos_4'][0].get_colour() != self.board_status['pos_1'][0].get_colour(): 
+                    if self.board_status['pos_1'][0].get_south() > self.board_status['pos_4'][0].get_north():
+                        # here we assign the value to possible_moves 
+                        print("1 versus 4 is a double flip with ",inv_card_index)
+                        self.possible_moves['pos_1'] = {inv_card_index:[inv_card_power,1]} # how to increment score?
 
+                        if self.board_status['pos_2'][0] != 'empty' and two_check==False: # card present
+                            two_check = True 
+                            if self.board_status['pos_2'][0].get_colour() != self.board_status['pos_1'][0].get_colour():
+                                if self.board_status['pos_1'][0].get_east() > self.board_status['pos_2'][0].get_east():
+                                    # here we assign the value to possible_moves 
+                                    print("1 versus 2 is a double flip with ",inv_card_index)
+                                    self.possible_moves['pos_1'] = {inv_card_index:[inv_card_power,2]} # how to increment score?
 
-        
+            # pos 2 check 
+            if self.board_status['pos_2'][0] != 'empty' and two_check==False: # card present 
+                if self.board_status['pos_2'][0].get_colour() != self.board_status['pos_1'][0].get_colour():
+                    if self.board_status['pos_1'][0].get_east() > self.board_status['pos_2'][0].get_east():
+                        # here we assign the value to possible_moves 
+                        print("1 versus 2 is a double flip with ",inv_card_index)
+                        self.possible_moves['pos_1'] = {inv_card_index:[inv_card_power,1]} # how to increment score?
 
-
-
-        
-
-        # search for attacks 
-        # based on our inventory
-        # extra methods? 
-        # # we need to define all available moves probably  
-
-        # for cards in inventory - ordered by 'power' (sum of poles) - optional later 
-        # loop through available positions 
-        # if a flip is available - track or take it 
-
-        # define combat for each position 
-        # loop through with each card and look for takes
-        # i think you need the actual cards rather than a reference to them to use their methods    
-
-     
-        
-
-
-
-
-
-
-# test all - done all combat works! 
-# define scoring 
-# introduce ability to view state of board visually - sort of better 
-# create ai 
-
-
-
-
-        
-# is it going to be an issue where the check is a compound check? ie a position wont have an attribute until a card is placed there 
-# could split it onto different lines 
+    
 
 
     
@@ -586,6 +618,16 @@ blue_player.inventory[0].set_east(9)
 print("Blue card after")
 blue_player.inventory[0].show_compass_values()
 
+blue_player.inventory[1].set_west(1)
+blue_player.inventory[1].set_south(1)
+blue_player.inventory[1].set_north(1)
+blue_player.inventory[1].set_east(1)
+
+blue_player.inventory[2].set_west(1)
+blue_player.inventory[2].set_south(1)
+blue_player.inventory[2].set_north(1)
+blue_player.inventory[2].set_east(1)
+
 
 # red card - these should be defeated by blue - minimise stats for debugging 
 print("red before")
@@ -613,6 +655,13 @@ red_player.inventory[3].set_north(1)
 red_player.inventory[3].set_south(1)
 red_player.inventory[3].set_west(1)
 
+red_player.inventory[4].set_east(9)
+red_player.inventory[4].set_north(9)
+red_player.inventory[4].set_south(9)
+red_player.inventory[4].set_west(9)
+
+
+
 
 ######### pos_0 attacking pos 1 checks
 # place red card [1] on pos_1 
@@ -637,27 +686,27 @@ red_player.inventory[3].set_west(1)
 
 # place red card [1] on pos_3 
 #print(board.get_positions())
-board.accept_card('pos_5',red_player.inventory[0])
+board.accept_card('pos_1',blue_player.inventory[1])
 #print(board.get_positions())
 
-board.accept_card('pos_7',red_player.inventory[1])
+board.accept_card('pos_3',blue_player.inventory[2])
 
 #board.accept_card('pos_8',red_player.inventory[2])
 
 #board.accept_card('pos_7',red_player.inventory[3])
 
 #card colour
-print(board.get_positions()['pos_5'][0].get_colour()) # it's red 
-print(board.get_positions()['pos_7'][0].get_colour()) # it's red 
+print(board.get_positions()['pos_1'][0].get_colour()) # it's red 
+print(board.get_positions()['pos_3'][0].get_colour()) # it's red 
 #print(board.get_positions()['pos_8'][0].get_colour()) # it's red 
 #print(board.get_positions()['pos_7'][0].get_colour()) # it's red 
 
 
 # now generate the attack 
-board.accept_card('pos_8',blue_player.inventory[0])
+#board.accept_card('pos_8',blue_player.inventory[0])
 
-print(board.get_positions()['pos_5'][0].get_colour()) # it's red 
-print(board.get_positions()['pos_7'][0].get_colour()) # it's red 
+#print(board.get_positions()['pos_5'][0].get_colour()) # it's red 
+#print(board.get_positions()['pos_7'][0].get_colour()) # it's red 
 #print(board.get_positions()['pos_8'][0].get_colour()) # it's red 
 #print(board.get_positions()['pos_7'][0].get_colour()) # it's red 
 
