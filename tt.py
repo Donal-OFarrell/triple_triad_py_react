@@ -667,3 +667,5 @@ board.state_of_board()
 print(board.ret_board_in_play())
 
 red_player.make_move(board)
+
+##
