@@ -472,7 +472,7 @@ class CPU():
         pos_0_checks={} # this will be added to self.possible_moves at the end of the method if not empty 
         
         for inv_card in self.inventory:
-            double_check = False
+            three_check = False # if 3 has been checked in the initial execution body (bool=True) - don't check it again
             inv_card_power = inv_card.card_power() # assses cards power/score 
             inv_card_index = self.inventory.index(inv_card)# assign an index to card being assessed 
             # pos 1 check with double case 
@@ -487,14 +487,14 @@ class CPU():
                         # another if statement here for the double case? 
                         if self.board_status['pos_3'][0] != 'empty':
                             print("nested boolean")
-                            double_check = True
+                            three_check = True
                             if self.board_status['pos_3'][0].get_colour() != inv_card.get_colour(): 
                                 if inv_card.get_south() > self.board_status['pos_3'][0].get_north():
                                     print("Double case for pos 0 with ", inv_card_index)
                                     pos_0_checks[inv_card_index] = [inv_card_power,2]
                                     
             # then a solitary check here for pos 3 check
-            if self.board_status['pos_3'][0] != 'empty' and double_check == False: # if the double check has taken place don't run this
+            if self.board_status['pos_3'][0] != 'empty' and three_check == False: # if the double check has taken place don't run this
                 if self.board_status['pos_3'][0].get_colour() != inv_card.get_colour(): 
                     if inv_card.get_south() > self.board_status['pos_3'][0].get_north():
                         print("0 versus 3 is a flip with ", inv_card_index)
@@ -503,7 +503,8 @@ class CPU():
         self.possible_moves['pos_0'] = pos_0_checks
 
     def pos_1_attack(self):
-        '''AI actions for pos_1 '''
+        '''AI actions for pos_1 
+        fights 0,2 and 4'''
         pos_1_checks={}
         for inv_card in self.inventory:
             inv_card_power = inv_card.card_power() # assses cards power/score
@@ -557,29 +558,468 @@ class CPU():
             # pos 4 check
             if self.board_status['pos_4'][0] != 'empty' and four_check==False: # card present
                 four_check=True
-                if self.board_status['pos_4'][0].get_colour() != self.board_status['pos_1'][0].get_colour(): 
-                    if self.board_status['pos_1'][0].get_south() > self.board_status['pos_4'][0].get_north():
+                if self.board_status['pos_4'][0].get_colour() != inv_card.get_colour(): 
+                    if inv_card.get_south() > self.board_status['pos_4'][0].get_north():
                         # here we assign the value to possible_moves 
                         print("1 versus 4 is a double flip with ",inv_card_index)
                         pos_1_checks[inv_card_index] = [inv_card_power,1]
 
                         if self.board_status['pos_2'][0] != 'empty' and two_check==False: # card present
                             two_check = True 
-                            if self.board_status['pos_2'][0].get_colour() != self.board_status['pos_1'][0].get_colour():
-                                if self.board_status['pos_1'][0].get_east() > self.board_status['pos_2'][0].get_east():
+                            if self.board_status['pos_2'][0].get_colour() != inv_card.get_colour():
+                                if inv_card.get_east() > self.board_status['pos_2'][0].get_east():
                                     # here we assign the value to possible_moves 
                                     print("1 versus 2 is a double flip with ",inv_card_index)
                                     pos_1_checks[inv_card_index] = [inv_card_power,2]
 
             # pos 2 check 
             if self.board_status['pos_2'][0] != 'empty' and two_check==False: # card present 
-                if self.board_status['pos_2'][0].get_colour() != self.board_status['pos_1'][0].get_colour():
-                    if self.board_status['pos_1'][0].get_east() > self.board_status['pos_2'][0].get_east():
+                if self.board_status['pos_2'][0].get_colour() != inv_card.get_colour():
+                    if inv_card.get_east() > self.board_status['pos_2'][0].get_east():
                         # here we assign the value to possible_moves 
                         print("1 versus 2 is a double flip with ",inv_card_index)
                         pos_1_checks[inv_card_index] = [inv_card_power,1]
         
         self.possible_moves['pos_1'] = pos_1_checks
+
+    def pos_2_attack(self):
+        ''' position 2 attack assessment method
+        in this case pos 2 will fight pos 1 and pos 5'''
+        pos_2_checks = {} # define dictionary which will contain potential attacks for each card
+        
+        for inv_card in self.inventory: 
+            five_check = False # bool to not repeat 5 checks in a double scoring situation 
+            inv_card_power = inv_card.card_power() # assses cards power/score
+            inv_card_index = self.inventory.index(inv_card)# assign an index to card being assessed 
+            # pos 1 check 
+            if self.board_status['pos_1'][0] != 'empty': # card present 
+                if self.board_status['pos_1'][0].get_colour() != inv_card.get_colour(): 
+                    if inv_card.get_west() > self.board_status['pos_1'][0].get_east():
+                        # here we assign the value to possible_moves 
+                        print("2 versus 1 is a flip with ",inv_card_index)
+                        pos_2_checks[inv_card_index] = [inv_card_power,1]
+
+                        # double check for pos 5 
+                        if self.board_status['pos_5'][0] != 'empty': # card present
+                            five_check = True # don't check again 
+                            if self.board_status['pos_5'][0].get_colour() != inv_card.get_colour():
+                                if inv_card.get_south() > self.board_status['pos_5'][0].get_north():
+                                    print("2 versus 5 is a double flip with ",inv_card_index)
+                                    pos_2_checks[inv_card_index] = [inv_card_power,2]
+
+            # pos 5 check 
+            if self.board_status['pos_5'][0] != 'empty' and five_check == False: # card present and not been checked already
+                    if self.board_status['pos_5'][0] != 'empty': # card present 
+                        if self.board_status['pos_5'][0].get_colour() != inv_card.get_colour():
+                            if inv_card.get_south() > self.board_status['pos_5'][0].get_north():
+                                print("2 versus 5 is a double flip with ",inv_card_index)
+                                pos_2_checks[inv_card_index] = [inv_card_power,1]
+
+        self.possible_moves['pos_2'] = pos_2_checks # add the checks to the possible_moves attribute 
+
+    def pos_3_attack(self):
+        ''' pos 3 will attack 0,4 and 6 '''
+        pos_3_checks={}
+        for inv_card in self.inventory:
+            inv_card_power = inv_card.card_power() # assses cards power/score
+            inv_card_index = self.inventory.index(inv_card)# assign an index to card being assessed 
+            four_check = False
+            six_check = False
+
+            # pos 0 check 
+            if self.board_status['pos_0'][0] != 'empty': # card present 
+                if self.board_status['pos_0'][0].get_colour() != inv_card.get_colour(): # colour is opposite - fight! 
+                    if inv_card.get_north() > self.board_status['pos_0'][0].get_south():
+                        print("3 versus 0 is a flip with ",inv_card_index)
+                        # here we assign the value to possible_moves 
+                        pos_3_checks[inv_card_index] = [inv_card_power,1]
+                        # another if statement here for the double case for pos 4 
+
+                        # pos 4 - double check
+                        print("first 4 check on double")
+                        print()
+                        if self.board_status['pos_4'][0] != 'empty': # card present
+                            four_check = True
+                            print("initial 4 check not empty passed")
+                            if self.board_status['pos_4'][0].get_colour() != inv_card.get_colour(): 
+                                if inv_card.east() > self.board_status['pos_4'][0].get_west():
+                                    # here we assign the value to possible_moves 
+                                    print("3 versus 4 is a double flip with ",inv_card_index)
+                                    pos_3_checks[inv_card_index] = [inv_card_power,2]
+                                    
+                                    # another if statement here for the triple case?
+                                    print("triple case")
+                                    if self.board_status['pos_6'][0] != 'empty' and six_check == False: # card present
+                                        two_check = True
+                                        if self.board_status['pos_6'][0].get_colour() != inv_card.get_colour():
+                                            if inv_card.get_south() > self.board_status['pos_6'][0].get_north():
+                                                # here we assign the value to possible_moves 
+                                                print("1 versus 2 is a triple flip with ",inv_card_index)
+                                                pos_3_checks[inv_card_index] = [inv_card_power,3]
+
+
+            # pos 4 check
+            if self.board_status['pos_4'][0] != 'empty' and four_check==False: # card present
+                if self.board_status['pos_4'][0].get_colour() != inv_card.get_colour(): 
+                    if inv_card.get_east() > self.board_status['pos_4'][0].get_west():
+                        # here we assign the value to possible_moves 
+                        print("3 versus 4 is a flip with ",inv_card_index)
+                        pos_3_checks[inv_card_index] = [inv_card_power,1]
+
+                        if self.board_status['pos_6'][0] != 'empty' and six_check==False: # card present
+                            six_check = True 
+                            if self.board_status['pos_6'][0].get_colour() != inv_card.get_colour():
+                                if inv_card.get_south() > self.board_status['pos_6'][0].get_north():
+                                    # here we assign the value to possible_moves 
+                                    print("3 versus 6 is a double flip with ",inv_card_index)
+                                    pos_1_checks[inv_card_index] = [inv_card_power,2]
+
+            # pos 6 check 
+            if self.board_status['pos_6'][0] != 'empty' and six_check==False: # card present 
+                if self.board_status['pos_6'][0].get_colour() != inv_card.get_colour():
+                    if inv_card.get_south() > self.board_status['pos_6'][0].get_north():
+                        # here we assign the value to possible_moves 
+                        print("3 versus 6 is a flip with ",inv_card_index)
+                        pos_3_checks[inv_card_index] = [inv_card_power,1]
+
+        self.possible_moves['pos_3'] = pos_3_checks
+
+            
+    def pos_4_attack(self):
+        ''' this might be tricky -
+        4 positions to attack - 
+        1,3,5 and 7 '''
+        pos_4_checks={}
+
+        for inv_card in self.inventory:
+            three_check = False
+            five_check= False
+            seven_check= False
+            inv_card_power = inv_card.card_power() # assses cards power/score
+            inv_card_index = self.inventory.index(inv_card)# assign an index to card being assessed
+
+            # pos 1 check 
+            if self.board_status['pos_1'][0] != 'empty': # card present
+                if self.board_status['pos_1'][0].get_colour() != inv_card.get_colour():
+                    if inv_card.get_north() > self.board_status['pos_1'][0].get_south():
+                        print("4 versus 1 is a flip with ",inv_card_index)
+                        pos_4_checks[inv_card_index] = [inv_card_power,1]
+
+                        # check for nested double case pos 3 
+                        if self.board_status['pos_3'][0] != 'empty': # card present
+                            three_check = True
+                            if self.board_status['pos_3'][0].get_colour() != inv_card.get_colour():
+                                if inv_card.get_west() > self.board_status['pos_3'][0].get_east():
+                                    print("4 versus 3 is a double flip with ",inv_card_index)
+                                    pos_4_checks[inv_card_index] = [inv_card_power,2]
+
+                                    # check for triple nested for pos 5 
+                                    if self.board_status['pos_5'][0] != 'empty': # card present 
+                                        five_check = True
+                                        if self.board_status['pos_5'][0].get_colour() != inv_card.get_colour():
+                                            if inv_card.get_west() > self.board_status['pos_5'][0].get_east():
+                                                print("4 versus 5 is a triple flip with ",inv_card_index)
+                                                pos_4_checks[inv_card_index] = [inv_card_power,3]
+
+                                                # check for quadruple nested for pos 7
+                                                if self.board_status['pos_7'][0] != 'empty': # card present
+                                                    seven_check = True
+                                                    if self.board_status['pos_7'][0].get_colour() != inv_card.get_colour():
+                                                        if inv_card.get_south() > self.board_status['pos_7'][0].get_north():
+                                                            print("4 versus 7 is a quadruple flip with ",inv_card_index)
+                                                            pos_4_checks[inv_card_index] = [inv_card_power,4]
+
+            # pos 3 check
+            if self.board_status['pos_3'][0] != 'empty' and three_check == False: # card present
+                three_check = True
+                if self.board_status['pos_3'][0].get_colour() != inv_card.get_colour():
+                    if inv_card.get_west() > self.board_status['pos_3'][0].get_east():
+                        print("4 versus 3 is a single flip with ",inv_card_index)
+                        pos_4_checks[inv_card_index] = [inv_card_power,1]
+
+                        # check for nested double for pos 5 
+                        if self.board_status['pos_5'][0] != 'empty' and five_check == False: # card present
+                            five_check = True
+                            if self.board_status['pos_5'][0].get_colour() != inv_card.get_colour():
+                                if inv_card.get_east() > self.board_status['pos_5'][0].get_west():
+                                    print("4 versus 5 is a double flip with ",inv_card_index)
+                                    pos_4_checks[inv_card_index] = [inv_card_power,2]
+
+                                    # check for nested triple with position 7 
+                                    if self.board_status['pos_7'][0] != 'empty' and seven_check == False: # card present
+                                        seven_check = True
+                                        if self.board_status['pos_7'][0].get_colour() != inv_card.get_colour():
+                                            if inv_card.get_south() > self.board_status['pos_7'][0].get_north():
+                                                print("4 versus 7 is a triple flip with ",inv_card_index)
+                                                pos_4_checks[inv_card_index] = [inv_card_power,3] 
+
+
+            # pos 5 check 
+            if self.board_status['pos_5'][0] != 'empty' and five_check == False: # card present  
+                five_check = True
+                if self.board_status['pos_5'][0].get_colour() != inv_card.get_colour():
+                    if inv_card.get_east() > self.board_status['pos_5'][0].get_west():
+                        print("4 versus 5 is a single flip with ",inv_card_index)
+                        pos_4_checks[inv_card_index] = [inv_card_power,1]
+
+                        # nested check for double for pos 7 
+
+                        if self.board_status['pos_7'][0] != 'empty' and seven_check == False: # card present
+                            seven_check = True
+                            if self.board_status['pos_7'][0].get_colour() != inv_card.get_colour():
+                                if inv_card.get_south() > self.board_status['pos_7'][0].get_north():
+                                    print("4 versus 7 is a double flip with ",inv_card_index)
+                                    pos_4_checks[inv_card_index] = [inv_card_power,2] 
+
+            # pos 7 check
+            if self.board_status['pos_7'][0] != 'empty' and seven_check == False: # card present 
+                if self.board_status['pos_7'][0].get_colour() != inv_card.get_colour():
+                    if inv_card.get_south() > self.board_status['pos_7'][0].get_north():
+                        print("4 versus 7 is a single flip with ",inv_card_index)
+                        pos_4_checks[inv_card_index] = [inv_card_power,1]
+
+        self.possible_moves['pos_4'] = pos_4_checks
+
+    def pos_5_attack(self):
+        ''' 5 attackes 2,4 and 8'''
+        pos_5_checks = {}
+
+        for inv_card in self.inventory:
+            four_check = False
+            eight_check= False
+            inv_card_power = inv_card.card_power() # assses cards power/score
+            inv_card_index = self.inventory.index(inv_card)# assign an index to card being assessed
+
+            # pos 2 check
+            if self.board_status['pos_2'][0] != 'empty': # card present
+                if self.board_status['pos_2'][0].get_colour() != inv_card.get_colour():
+                    if inv_card.get_north() > self.board_status['pos_2'][0].get_south():
+                        print("5 versus 2 is a single flip with ",inv_card_index)
+                        pos_5_checks[inv_card_index] = [inv_card_power,1]
+
+                        # nested double case for 4
+                        if self.board_status['pos_4'][0] != 'empty': # card present
+                            four_check = True 
+                            if self.board_status['pos_4'][0].get_colour() != inv_card.get_colour():
+                                if inv_card.get_west() > self.board_status['pos_4'][0].get_east():
+                                    print("5 versus 4 is a double flip with ",inv_card_index)
+                                    pos_5_checks[inv_card_index] = [inv_card_power,2]
+
+                                    # nested triple case for 8
+                                    if self.board_status['pos_8'][0] != 'empty': # card present 
+                                        eight_check = True
+                                        if self.board_status['pos_8'][0].get_colour() != inv_card.get_colour():
+                                            if inv_card.get_south() > self.board_status['pos_8'][0].get_north():
+                                                print("5 versus 8 is a triple flip with ",inv_card_index)
+                                                pos_5_checks[inv_card_index] = [inv_card_power,3]
+
+            # pos 4 check
+            if self.board_status['pos_4'][0] != 'empty' and four_check == False: # card present
+                four_check = True 
+                if self.board_status['pos_4'][0].get_colour() != inv_card.get_colour():
+                    if inv_card.get_west() > self.board_status['pos_4'][0].get_east():
+                        print("5 versus 4 is a single flip with ",inv_card_index)
+                        pos_5_checks[inv_card_index] = [inv_card_power,1]
+
+                        # double check for pos 8
+                        if self.board_status['pos_8'][0] != 'empty' and eight_check == False:
+                            eight_check = True
+                            if self.board_status['pos_8'][0].get_colour() != inv_card.get_colour():
+                                if inv_card.get_south() > self.board_status['pos_8'][0].get_north():
+                                    print("5 versus 8 is a double flip with ",inv_card_index)
+                                    pos_5_checks[inv_card_index] = [inv_card_power,2]
+
+            # pos 8 check 
+            if self.board_status['pos_8'][0] != 'empty' and eight_check == False: # card present
+                if self.board_status['pos_8'][0].get_colour() != inv_card.get_colour():
+                    if inv_card.get_south() > self.board_status['pos_8'][0].get_north():
+                        print("5 versus 8 is a single flip with ",inv_card_index)
+                        pos_5_checks[inv_card_index] = [inv_card_power,1]
+
+        self.positions['pos_5'] = pos_5_checks
+
+
+    def pos_6_attack(self):
+        ''' 6 attacks 3 and 7'''
+        pos_6_checks={}
+        for inv_card in self.inventory:
+            seven_check = False
+            inv_card_power = inv_card.card_power() # assses cards power/score
+            inv_card_index = self.inventory.index(inv_card)# assign an index to card being assessed
+
+            # pos 3 check
+            if self.board_status['pos_3'][0] != 'empty' == False:
+                if self.board_status['pos_3'][0].get_colour() != inv_card.get_colour():
+                    if inv_card.get_north() > self.board_status['pos_3'][0].get_south():
+                        print("6 versus 3 is a single flip with ",inv_card_index)
+                        pos_6_checks[inv_card_index] = [inv_card_power,1]
+
+                        # check for nested double case for pos 7
+                        if self.board_status['pos_7'][0] != 'empty' == False: 
+                            seven_check= True
+                            if self.board_status['pos_7'][0].get_colour() != inv_card.get_colour():
+                                if inv_card.get_east() > self.board_status['pos_7'][0].get_west():
+                                    print("6 versus 7 is a double flip with ",inv_card_index)
+                                    pos_6_checks[inv_card_index] = [inv_card_power,2]
+
+            # pos 7 check
+            if self.board_status['pos_7'][0] != 'empty' and seven_check == False: 
+                if self.board_status['pos_7'][0].get_colour() != inv_card.get_colour():
+                    if inv_card.get_east() > self.board_status['pos_7'][0].get_west():
+                        print("6 versus 7 is a single flip with ",inv_card_index)
+                        pos_6_checks[inv_card_index] = [inv_card_power,1]
+        
+        self.positions['pos_6'] = pos_6_checks
+
+    def pos_7_attack(self):
+        ''' 7 attacks 6, 4 and 8 '''
+        pos_7_checks = {}
+        for inv_card in self.inventory:
+            four_check = False
+            eight_check = False
+            inv_card_power = inv_card.card_power() # assses cards power/score
+            inv_card_index = self.inventory.index(inv_card)# assign an index to card being assessed
+
+            # pos 6 check 
+            if self.board_status['pos_6'][0] != 'empty':
+                if self.board_status['pos_6'][0].get_colour() != inv_card.get_colour():
+                    if inv_card.get_west() > self.board_status['pos_6'][0].get_east():
+                        print("7 versus 6 is a single flip with ",inv_card_index)
+                        pos_7_checks[inv_card_index] = [inv_card_power,1]
+
+                        # nested case for double at pos 4 
+                        if self.board_status['pos_4'][0] != 'empty':
+                            four_check= True
+                            if self.board_status['pos_4'][0].get_colour() != inv_card.get_colour():
+                                if inv_card.get_north() > self.board_status['pos_4'][0].get_south():
+                                    print("7 versus 4 is a double flip with ",inv_card_index)
+                                    pos_7_checks[inv_card_index] = [inv_card_power,2]
+
+                                    # nested triple case at pos 8 
+                                    if self.board_status['pos_8'][0] != 'empty':
+                                        eight_check = True
+                                        if self.board_status['pos_8'][0].get_colour() != inv_card.get_colour():
+                                            if inv_card.get_east() > self.board_status['pos_8'][0].get_west():
+                                                print("7 versus 8 is a triple flip with ",inv_card_index)
+                                                pos_7_checks[inv_card_index] = [inv_card_power,3]
+
+            # pos 4 check 
+            if self.board_status['pos_4'][0] != 'empty' and four_check == False:
+                four_check= True
+                if self.board_status['pos_4'][0].get_colour() != inv_card.get_colour():
+                    if inv_card.get_north() > self.board_status['pos_4'][0].get_south():
+                        print("7 versus 4 is a single flip with ",inv_card_index)
+                        pos_7_checks[inv_card_index] = [inv_card_power,1]
+
+                        # nested double case for pos 8
+                        if self.board_status['pos_8'][0] != 'empty':
+                            eight_check = True
+                            if self.board_status['pos_8'][0].get_colour() != inv_card.get_colour():
+                                if inv_card.get_east() > self.board_status['pos_8'][0].get_west():
+                                    print("7 versus 8 is a double flip with ",inv_card_index)
+                                    pos_7_checks[inv_card_index] = [inv_card_power,2] 
+
+            # pos 8 check 
+            if self.board_status['pos_4'][0] != 'empty' and eight_check == False:                    
+                if self.board_status['pos_8'][0].get_colour() != inv_card.get_colour():
+                    if inv_card.get_east() > self.board_status['pos_8'][0].get_west():
+                        print("7 versus 8 is a double flip with ",inv_card_index)
+                        pos_7_checks[inv_card_index] = [inv_card_power,2] 
+
+        self.possible_moves = pos_7_checks
+
+    def pos_7_attack(self):
+        ''' 8 attacks 5 and 7'''
+        pos_8_checks={}
+
+        for inv_card in self.inventory:
+            seven_check = false
+            inv_card_power = inv_card.card_power() # assses cards power/score
+            inv_card_index = self.inventory.index(inv_card)# assign an index to card being assessed
+
+            # pos 5 check
+            if self.board_status['pos_5'][0] != 'empty': 
+                if self.board_status['pos_5'][0].get_colour() != inv_card.get_colour():
+                    if inv_card.get_north() > self.board_status['pos_5'][0].get_south():
+                        print("8 versus 5 is a single flip with ",inv_card_index)
+                        pos_8_checks[inv_card_index] = [inv_card_power,1]
+
+                        # nested double case for pos 7
+                        if self.board_status['pos_7'][0] != 'empty':
+                            seven_check == True
+                            if self.board_status['pos_7'][0].get_colour() != inv_card.get_colour():
+                                if inv_card.get_west() > self.board_status['pos_7'][0].get_east():
+                                    print("8 versus 7 is a double flip with ",inv_card_index)
+                                    pos_8_checks[inv_card_index] = [inv_card_power,2]
+
+            # pos 7 check 
+            if self.board_status['pos_7'][0] != 'empty' and seven_check == False:
+                seven_check == True
+                if self.board_status['pos_7'][0].get_colour() != inv_card.get_colour():
+                    if inv_card.get_west() > self.board_status['pos_7'][0].get_east():
+                        print("8 versus 7 is a single flip with ",inv_card_index)
+                        pos_8_checks[inv_card_index] = [inv_card_power,1]
+
+
+
+
+
+
+
+
+
+
+    
+
+                            
+
+
+
+                                    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+             
+
+
+
+
+
+
 
     
 # issue occurs as the index will overwrite each time you reassign pos_1 - need to fix this 
