@@ -156,7 +156,7 @@ class Board():
         for key in keys:
             card = positions[key][0]
             if card == 'empty':
-                board_dict[key] = ['no_card','no_values']
+                board_dict[key] = ['empty','no_values']
             else:
                 board_dict[key] = [card,card.return_compass_values()]
 
@@ -389,13 +389,13 @@ class CPU():
         self.inventory=[]
         self.attack_map= {'pos_0':self.pos_0_attack, 
                       'pos_1':self.pos_1_attack,
-                      'pos_2':'pos_2_attack',
-                      'pos_3':'pos_3_attack',
-                      'pos_4':'pos_4_attack',
-                      'pos_5':'pos_5_attack',
-                      'pos_6':'pos_6_attack',
-                      'pos_7':'pos_7_attack',
-                      'pos_8':'pos_8_attack'}
+                      'pos_2':self.pos_2_attack,
+                      'pos_3':self.pos_3_attack,
+                      'pos_4':self.pos_4_attack,
+                      'pos_5':self.pos_5_attack,
+                      'pos_6':self.pos_6_attack,
+                      'pos_7':self.pos_7_attack,
+                      'pos_8':self.pos_8_attack}
         self.board_status = {}
         self.spaces_in_play={}
         self.occupied_spaces={}
@@ -417,8 +417,8 @@ class CPU():
     def assess_board(self,board):
         self.board_status = board.ret_board_in_play()
         print()
-        print ("Printing board in play from CPU class")
-        print(self.board_status)
+        #print ("Printing board in play from CPU class")
+        #print(self.board_status)
 
 
 
@@ -435,11 +435,11 @@ class CPU():
             else:
                 self.occupied_spaces[key] = value
 
-        print()
+        #print()
         print("Available spaces from CPU class")
         print(self.spaces_in_play)
-        print("Unavailable spaces from CPU class")
-        print(self.occupied_spaces)
+        #print("Unavailable spaces from CPU class")
+        #print(self.occupied_spaces)
 
 
     def make_move(self,board):
@@ -452,11 +452,11 @@ class CPU():
 
         print("looping through attack options")
         for option in attack_options: 
-            print(self.attack_map[option])
-
-        # manually invoke pos_0_attack
-        print("Manually invoking pos 1 attack")
-        self.pos_1_attack()
+            print()
+            print(option)
+            self.attack_map[option]()
+            print("printing board status")
+            print(self.board_status)
 
 
         # then here assess the possible moves and pick the best - ie produces flip with weakest card 
@@ -501,6 +501,8 @@ class CPU():
                         pos_0_checks[inv_card_index] = [inv_card_power,1] 
 
         self.possible_moves['pos_0'] = pos_0_checks
+        print("checking possible moves")
+        print(self.possible_moves)
 
     def pos_1_attack(self):
         '''AI actions for pos_1 
@@ -581,6 +583,8 @@ class CPU():
                         pos_1_checks[inv_card_index] = [inv_card_power,1]
         
         self.possible_moves['pos_1'] = pos_1_checks
+        print("checking possible moves")
+        print(self.possible_moves)
 
     def pos_2_attack(self):
         ''' position 2 attack assessment method
@@ -642,7 +646,7 @@ class CPU():
                             four_check = True
                             print("initial 4 check not empty passed")
                             if self.board_status['pos_4'][0].get_colour() != inv_card.get_colour(): 
-                                if inv_card.east() > self.board_status['pos_4'][0].get_west():
+                                if inv_card.get_east() > self.board_status['pos_4'][0].get_west():
                                     # here we assign the value to possible_moves 
                                     print("3 versus 4 is a double flip with ",inv_card_index)
                                     pos_3_checks[inv_card_index] = [inv_card_power,2]
@@ -683,6 +687,8 @@ class CPU():
                         pos_3_checks[inv_card_index] = [inv_card_power,1]
 
         self.possible_moves['pos_3'] = pos_3_checks
+        print("checking possible moves")
+        print(self.possible_moves)
 
             
     def pos_4_attack(self):
@@ -779,6 +785,8 @@ class CPU():
                         pos_4_checks[inv_card_index] = [inv_card_power,1]
 
         self.possible_moves['pos_4'] = pos_4_checks
+        print("checking possible moves")
+        print(self.possible_moves)
 
     def pos_5_attack(self):
         ''' 5 attackes 2,4 and 8'''
@@ -836,7 +844,9 @@ class CPU():
                         print("5 versus 8 is a single flip with ",inv_card_index)
                         pos_5_checks[inv_card_index] = [inv_card_power,1]
 
-        self.positions['pos_5'] = pos_5_checks
+        self.possible_moves['pos_5'] = pos_5_checks
+        print("checking possible moves")
+        print(self.possible_moves)
 
 
     def pos_6_attack(self):
@@ -863,13 +873,17 @@ class CPU():
                                     pos_6_checks[inv_card_index] = [inv_card_power,2]
 
             # pos 7 check
-            if self.board_status['pos_7'][0] != 'empty' and seven_check == False: 
+            if self.board_status['pos_7'][0] != 'empty' and seven_check == False:
+                print("checks")
+                print(self.board_status['pos_7'][0],inv_card.get_colour()) 
                 if self.board_status['pos_7'][0].get_colour() != inv_card.get_colour():
                     if inv_card.get_east() > self.board_status['pos_7'][0].get_west():
                         print("6 versus 7 is a single flip with ",inv_card_index)
                         pos_6_checks[inv_card_index] = [inv_card_power,1]
         
-        self.positions['pos_6'] = pos_6_checks
+        self.possible_moves['pos_6'] = pos_6_checks
+        print("checking possible moves")
+        print(self.possible_moves)
 
     def pos_7_attack(self):
         ''' 7 attacks 6, 4 and 8 '''
@@ -920,20 +934,25 @@ class CPU():
                                     pos_7_checks[inv_card_index] = [inv_card_power,2] 
 
             # pos 8 check 
-            if self.board_status['pos_4'][0] != 'empty' and eight_check == False:                    
+            if self.board_status['pos_8'][0] != 'empty' and eight_check == False:  
+                print("pos 7 attack, pos 8 check")
+                print(self.board_status['pos_8'][0].get_colour())
+
                 if self.board_status['pos_8'][0].get_colour() != inv_card.get_colour():
                     if inv_card.get_east() > self.board_status['pos_8'][0].get_west():
                         print("7 versus 8 is a double flip with ",inv_card_index)
                         pos_7_checks[inv_card_index] = [inv_card_power,2] 
 
-        self.possible_moves = pos_7_checks
+        self.possible_moves['pos_7'] = pos_7_checks
+        print("checking possible moves")
+        print(self.possible_moves)
 
-    def pos_7_attack(self):
+    def pos_8_attack(self):
         ''' 8 attacks 5 and 7'''
         pos_8_checks={}
 
         for inv_card in self.inventory:
-            seven_check = false
+            seven_check = False
             inv_card_power = inv_card.card_power() # assses cards power/score
             inv_card_index = self.inventory.index(inv_card)# assign an index to card being assessed
 
@@ -959,70 +978,12 @@ class CPU():
                     if inv_card.get_west() > self.board_status['pos_7'][0].get_east():
                         print("8 versus 7 is a single flip with ",inv_card_index)
                         pos_8_checks[inv_card_index] = [inv_card_power,1]
-
-
-
-
-
-
-
-
-
+        self.possible_moves['pos_8'] = pos_8_checks
+        print("checking possible moves")
+        print(self.possible_moves)
 
     
-
-                            
-
-
-
-                                    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-             
-
-
-
-
-
-
-
-    
-# issue occurs as the index will overwrite each time you reassign pos_1 - need to fix this 
+# calculate exposure method in board 
 
     
 # check if it changes colour 
@@ -1081,6 +1042,16 @@ blue_player.inventory[2].set_west(1)
 blue_player.inventory[2].set_south(1)
 blue_player.inventory[2].set_north(1)
 blue_player.inventory[2].set_east(1)
+
+blue_player.inventory[3].set_west(1)
+blue_player.inventory[3].set_south(1)
+blue_player.inventory[3].set_north(1)
+blue_player.inventory[3].set_east(1)
+
+blue_player.inventory[4].set_west(1)
+blue_player.inventory[4].set_south(1)
+blue_player.inventory[4].set_north(1)
+blue_player.inventory[4].set_east(1)
 
 
 # red card - these should be defeated by blue - minimise stats for debugging 
@@ -1147,12 +1118,16 @@ board.accept_card('pos_2',blue_player.inventory[1])
 
 board.accept_card('pos_4',blue_player.inventory[2])
 
+#board.accept_card('pos_3',blue_player.inventory[3])
+#print(board.get_positions())
+
+#board.accept_card('pos_5',blue_player.inventory[4])
+
+
+
 #board.accept_card('pos_7',red_player.inventory[3])
 
-#card colour
-print(board.get_positions()['pos_0'][0].get_colour()) # it's red 
-print(board.get_positions()['pos_2'][0].get_colour()) # it's red 
-print(board.get_positions()['pos_4'][0].get_colour()) # it's red 
+
 #print(board.get_positions()['pos_7'][0].get_colour()) # it's red 
 
 
