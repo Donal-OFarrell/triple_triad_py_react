@@ -858,15 +858,15 @@ class CPU():
             inv_card_index = self.inventory.index(inv_card)# assign an index to card being assessed
 
             # pos 3 check
-            if self.board_status['pos_3'][0] != 'empty' == False:
+            if self.board_status['pos_3'][0] != 'empty':
                 if self.board_status['pos_3'][0].get_colour() != inv_card.get_colour():
                     if inv_card.get_north() > self.board_status['pos_3'][0].get_south():
                         print("6 versus 3 is a single flip with ",inv_card_index)
                         pos_6_checks[inv_card_index] = [inv_card_power,1]
 
                         # check for nested double case for pos 7
-                        if self.board_status['pos_7'][0] != 'empty' == False: 
-                            seven_check= True
+                        if self.board_status['pos_7'][0] != 'empty': 
+                            seven_check = True
                             if self.board_status['pos_7'][0].get_colour() != inv_card.get_colour():
                                 if inv_card.get_east() > self.board_status['pos_7'][0].get_west():
                                     print("6 versus 7 is a double flip with ",inv_card_index)
@@ -965,7 +965,7 @@ class CPU():
 
                         # nested double case for pos 7
                         if self.board_status['pos_7'][0] != 'empty':
-                            seven_check == True
+                            seven_check = True
                             if self.board_status['pos_7'][0].get_colour() != inv_card.get_colour():
                                 if inv_card.get_west() > self.board_status['pos_7'][0].get_east():
                                     print("8 versus 7 is a double flip with ",inv_card_index)
@@ -983,23 +983,13 @@ class CPU():
         print(self.possible_moves)
 
     
-# calculate exposure method in board 
 
-    
-# check if it changes colour 
-       
-
-    #def display_board
 
 # tests 
 
 # check if deck builds and we have alternating colours - yes 
 deck_test = Deck()
-#print(deck_test.cards[0].get_colour())
-#j=0
-#for card in deck_test.cards:
-#    print (j,card.get_colour())
-#    j +=1 
+
 
 # define some players 
 blue_player = Player()
@@ -1087,57 +1077,7 @@ red_player.inventory[4].set_west(9)
 
 
 
-
-######### pos_0 attacking pos 1 checks
-# place red card [1] on pos_1 
-#print(board.get_positions())
-#board.accept_card('pos_1',red_player.inventory[1])
-#print(board.get_positions())
-
-#print("pos1 card colour")
-#print(board.get_positions()['pos_1'][0].get_colour()) # it's red 
-
-# let's attack it 
-
-#board.accept_card('pos_0',blue_player.inventory[0])
-
-#print("pos 1 card colour after fight")
-#print(board.get_positions()['pos_1'][0].get_colour()) # blue now - excellent - hardcoded but still great work!
-
-
-#board.state_of_board()
-
-######### check position 1 combat 
-
-# place red card [1] on pos_3 
-#print(board.get_positions())
-board.accept_card('pos_0',blue_player.inventory[0])
-#print(board.get_positions())
-
-board.accept_card('pos_2',blue_player.inventory[1])
-
-board.accept_card('pos_4',blue_player.inventory[2])
-
-#board.accept_card('pos_3',blue_player.inventory[3])
-#print(board.get_positions())
-
-#board.accept_card('pos_5',blue_player.inventory[4])
-
-
-
-#board.accept_card('pos_7',red_player.inventory[3])
-
-
-#print(board.get_positions()['pos_7'][0].get_colour()) # it's red 
-
-
-# now generate the attack 
-#board.accept_card('pos_8',blue_player.inventory[0])
-
-#print(board.get_positions()['pos_5'][0].get_colour()) # it's red 
-#print(board.get_positions()['pos_7'][0].get_colour()) # it's red 
-#print(board.get_positions()['pos_8'][0].get_colour()) # it's red 
-#print(board.get_positions()['pos_7'][0].get_colour()) # it's red 
+board.accept_card('pos_7',blue_player.inventory[0])
 
 
 board.state_of_board()
@@ -1146,4 +1086,3 @@ print(board.ret_board_in_play())
 
 red_player.make_move(board)
 
-##
