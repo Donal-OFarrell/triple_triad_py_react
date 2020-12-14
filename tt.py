@@ -400,6 +400,7 @@ class CPU():
         self.spaces_in_play={}
         self.occupied_spaces={}
         self.possible_moves = {} #{'pos_0':{inv_0:[card power as int,score as int]}}
+        self.defensive_moves={}
         
 
     def add_to_inventory(self,card):
@@ -981,6 +982,29 @@ class CPU():
         self.possible_moves['pos_8'] = pos_8_checks
         print("checking possible moves")
         print(self.possible_moves)
+
+    def pos_0_defense(self):
+        ''' makes a defensive assessment for position 0,
+        defense is not just considered when no moves are available,
+        an optimal attack considers a move which leaves the attacking card
+        least vulnerable to attack  by the ooponent on the next turn '''
+
+        pos_1_empty = False
+        pos_3_empty = False
+
+        #assess neighbours status 
+        if self.board_status['pos_1'][0] == 'empty':
+            pos_1_empty = True
+
+        if self.board_status['pos_3'][0] == 'empty':
+            pos_3_empty = True
+
+        if pos_1_empty:
+            for inv_card in self.inventory: # we sort of need this to be the cards that can produce the attack though - afterwards I'd say...
+                inv_card_index = self.inventory.index(inv_card)
+            
+
+
 
     
 

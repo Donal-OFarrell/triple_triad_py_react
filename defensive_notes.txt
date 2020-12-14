@@ -1,0 +1,61 @@
+Exposed poles should be the determining defensive factor
+
+A sum is not ideal because 9+1 yields 10 but 1 is obviously vulnerable
+
+If either pole is less than 6 then it's exposed 
+
+If you hardcode a hard threshold though you might run into problems? 
+
+This is tricky :D 
+
+Initially need to find a way to assess exposed poles - then build from there 
+
+The CPU should be the one to assess whether a card is exposed - not a card - maybe a board... [OOP musings]
+
+default covered poles 
+
+// default hidden poles for given positions 
+self.default covers = {
+    pos_0: [west,north], 
+    pos_1: [north], 
+    pos_2: [north,east],
+    pos_3: [west],
+    pos_4: [], 
+    pos_5: [east],
+    pos_6: [west,south],
+    pos_7: [south],
+    pos_8: [south,east], 
+    }
+
+// then maybe we could add to these ?
+// or the inverse would be the exposed poles for each position 
+
+then we have: 
+
+for inv_card in available_spaces: 
+    #find least exposure (i.e. 1 pole is beter than 2 or 3) 
+    find strongest number to place in this position for the exposed pole(s) 
+
+so for the above to work - we need exposed poles rather than hidden poles - therefore we need a new way to read the board 
+
+I think you need a method for each eg
+
+
+And it should also be invoked after an attack choice is made - then you invoke this too 
+
+pos0 defense 
+
+pos1_empty == true 
+pos3_empty == False
+
+Only the true needs to be assesed 
+for inv_card in self.inventory:
+    #assess east 
+    save highest 
+    if bigger that's the index 
+    then add it to a variable as the card to play 
+
+--> could technically add this to the attack methods - but I think it makes more sense in make move 
+
+
+
