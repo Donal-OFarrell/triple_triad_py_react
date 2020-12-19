@@ -1117,18 +1117,189 @@ class CPU():
 
         self.defensive_moves['pos_3'] = pos_3_defensives
 
+    def pos_4_defense(self,cards):
+        ''' 4 will consider 1,3,5 and 7'''
+
+        pos_4_defensives= {}
+
+        pos_1_empty = False
+        pos_3_empty = False
+        pos_5_empty = False   
+        pos_7_empty = False 
+
+        #assess neighbours status 
+        if self.board_status['pos_1'][0] == 'empty':
+            pos_1_empty = True
+
+        if self.board_status['pos_3'][0] == 'empty':
+            pos_3_empty = True
+
+        if self.board_status['pos_5'][0] == 'empty':
+            pos_5_empty = True
+
+        if self.board_status['pos_7'][0] == 'empty':
+            pos_7_empty = True
+
+        if pos_1_empty:
+            for inv_card in cards: 
+                inv_card_index = self.inventory.index(inv_card)
+                pos_4_defensives[inv_card] = ['north_defense',inv_card.get_north()]
+
+        if pos_3_empty:
+            for inv_card in cards: 
+                inv_card_index = self.inventory.index(inv_card)
+                pos_4_defensives[inv_card] = ['west_defense',inv_card.get_west()]
+
+        if pos_5_empty:
+            for inv_card in cards: 
+                inv_card_index = self.inventory.index(inv_card)
+                pos_4_defensives[inv_card] = ['east_defense',inv_card.get_east()]
+
+        if pos_7_empty:
+            for inv_card in cards: 
+                inv_card_index = self.inventory.index(inv_card)
+                pos_4_defensives[inv_card] = ['south_defense',inv_card.get_south()]
+
+        self.defensive_moves['pos_4'] = pos_4_defensives
 
 
+    def pos_5_defense(self,cards):
+        ''' 5 will consider 2,4 and 8'''
 
+        pos_5_defensives= {}
+
+        pos_2_empty = False
+        pos_4_empty = False
+        pos_8_empty = False   
+         
+
+        #assess neighbours status 
+        if self.board_status['pos_2'][0] == 'empty':
+            pos_2_empty = True
+
+        if self.board_status['pos_4'][0] == 'empty':
+            pos_4_empty = True
+
+        if self.board_status['pos_8'][0] == 'empty':
+            pos_8_empty = True
+
+
+        if pos_2_empty:
+            for inv_card in cards: 
+                inv_card_index = self.inventory.index(inv_card)
+                pos_5_defensives[inv_card] = ['north_defense',inv_card.get_north()]
+
+        if pos_4_empty:
+            for inv_card in cards: 
+                inv_card_index = self.inventory.index(inv_card)
+                pos_5_defensives[inv_card] = ['west_defense',inv_card.get_west()]
+
+        if pos_8_empty:
+            for inv_card in cards: 
+                inv_card_index = self.inventory.index(inv_card)
+                pos_5_defensives[inv_card] = ['south_defense',inv_card.get_south()]
+
+        self.defensive_moves['pos_5'] = pos_5_defensives
+
+    def pos_6_defense(self,cards):
+        ''' 6 will consider 3 and 7 '''
+
+        pos_6_defensives= {}
+
+        pos_3_empty = False
+        pos_7_empty = False
+   
+        #assess neighbours status 
+        if self.board_status['pos_3'][0] == 'empty':
+            pos_3_empty = True
+
+        if self.board_status['pos_7'][0] == 'empty':
+            pos_7_empty = True
+
+
+        if pos_3_empty:
+            for inv_card in cards: 
+                inv_card_index = self.inventory.index(inv_card)
+                pos_6_defensives[inv_card] = ['north_defense',inv_card.get_north()]
+
+        if pos_7_empty:
+            for inv_card in cards: 
+                inv_card_index = self.inventory.index(inv_card)
+                pos_6_defensives[inv_card] = ['east_defense',inv_card.get_east()]
+
+        self.defensive_moves['pos_6'] = pos_6_defensives
+
+    def pos_7_defensives(self,cards):
+        ''' 7 will consider 6,4 and 8 '''
+
+        pos_7_defensives= {}
+
+        pos_6_empty = False
+        pos_4_empty = False
+        pos_8_empty = False   
+         
+
+        #assess neighbours status 
+        if self.board_status['pos_6'][0] == 'empty':
+            pos_6_empty = True
+
+        if self.board_status['pos_4'][0] == 'empty':
+            pos_4_empty = True
+
+        if self.board_status['pos_8'][0] == 'empty':
+            pos_8_empty = True
+
+
+        if pos_6_empty:
+            for inv_card in cards: 
+                inv_card_index = self.inventory.index(inv_card)
+                pos_7_defensives[inv_card] = ['west_defense',inv_card.get_west()]
+
+        if pos_4_empty:
+            for inv_card in cards: 
+                inv_card_index = self.inventory.index(inv_card)
+                pos_7_defensives[inv_card] = ['north_defense',inv_card.get_north()]
+
+        if pos_8_empty:
+            for inv_card in cards: 
+                inv_card_index = self.inventory.index(inv_card)
+                pos_7_defensives[inv_card] = ['east_defense',inv_card.get_east()]
+
+        self.defensive_moves['pos_7'] = pos_7_defensives
+
+    def pos_8_defense(self,cards):
+        ''' 8 will consider 5 and 7 '''
+
+        pos_8_defensives= {}
+
+        pos_5_empty = False
+        pos_7_empty = False
+   
+        #assess neighbours status 
+        if self.board_status['pos_5'][0] == 'empty':
+            pos_5_empty = True
+
+        if self.board_status['pos_7'][0] == 'empty':
+            pos_7_empty = True
+
+
+        if pos_5_empty:
+            for inv_card in cards: 
+                inv_card_index = self.inventory.index(inv_card)
+                pos_8_defensives[inv_card] = ['north_defense',inv_card.get_north()]
+
+        if pos_7_empty:
+            for inv_card in cards: 
+                inv_card_index = self.inventory.index(inv_card)
+                pos_6_defensives[inv_card] = ['west_defense',inv_card.get_west()]
+
+        self.defensive_moves['pos_8'] = pos_8_defensives
+
+            
             
 # what get's passed to the defensive methods is:
 #   if there are attacks we pass those to assess their defense relative to the attack
 #   if there are no attacks we pass all the possible spaces and pick the best move 
-
-
-
-    
-
 
 # tests 
 
