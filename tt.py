@@ -983,11 +983,13 @@ class CPU():
         print("checking possible moves")
         print(self.possible_moves)
 
-    def pos_0_defense(self):
+    def pos_0_defense(self,cards):
         ''' makes a defensive assessment for position 0,
         defense is not just considered when no moves are available,
         an optimal attack considers a move which leaves the attacking card
         least vulnerable to attack  by the ooponent on the next turn '''
+
+        pos_0_defensives= {}
 
         pos_1_empty = False
         pos_3_empty = False
@@ -1000,9 +1002,128 @@ class CPU():
             pos_3_empty = True
 
         if pos_1_empty:
-            for inv_card in self.inventory: # we sort of need this to be the cards that can produce the attack though - afterwards I'd say...
+            for inv_card in cards: # pass the cards under consideration for defensive moves - all if no attacks - only attack cards in event of offensive move available 
                 inv_card_index = self.inventory.index(inv_card)
+                pos_0_defensives[inv_card] = ['east_defense',inv_card.get_east()]
+
+        if pos_3_empty:
+            for inv_card in cards: 
+                inv_card_index = self.inventory.index(inv_card)
+                pos_0_defensives[inv_card] = ['south_defense',inv_card.get_south()]
+
+        self.defensive_moves['pos_0'] = pos_0_defensives
+
+
+    def pos_1_defense(self,cards):
+        ''' 1 will consider 0, 2 and 4 '''
+
+        pos_1_defensives= {}
+
+        pos_0_empty = False
+        pos_2_empty = False
+        pos_4_empty = False
+
+        #assess neighbours status 
+        if self.board_status['pos_0'][0] == 'empty':
+            pos_0_empty = True
+
+        if self.board_status['pos_2'][0] == 'empty':
+            pos_2_empty = True
+
+        if self.board_status['pos_4'][0] == 'empty':
+            pos_4_empty = True
+
+        if pos_0_empty:
+            for inv_card in cards: # pass the cards under consideration for defensive moves - all if no attacks - only attack cards in event of offensive move available 
+                inv_card_index = self.inventory.index(inv_card)
+                pos_1_defensives[inv_card] = ['west_defense',inv_card.get_west()]
+
+        if pos_2_empty:
+            for inv_card in cards: 
+                inv_card_index = self.inventory.index(inv_card)
+                pos_0_defensives[inv_card] = ['east_defense',inv_card.get_east()]
+
+        if pos_4_empty:
+            for inv_card in cards: 
+                inv_card_index = self.inventory.index(inv_card)
+                pos_0_defensives[inv_card] = ['south_defense',inv_card.get_south()]
+
+        self.defensive_moves['pos_1'] = pos_1_defensives
+
+    def pos_2_defense(self,cards):
+        ''' 2 will consider 1 and 5 '''
+
+        pos_2_defensives= {}
+
+        pos_1_empty = False
+        pos_5_empty = False
+
+
+        #assess neighbours status 
+        if self.board_status['pos_1'][0] == 'empty':
+            pos_1_empty = True
+
+        if self.board_status['pos_5'][0] == 'empty':
+            pos_5_empty = True
+
+
+        if pos_1_empty:
+            for inv_card in cards: # pass the cards under consideration for defensive moves - all if no attacks - only attack cards in event of offensive move available 
+                inv_card_index = self.inventory.index(inv_card)
+                pos_2_defensives[inv_card] = ['west_defense',inv_card.get_west()]
+
+        if pos_5_empty:
+            for inv_card in cards: 
+                inv_card_index = self.inventory.index(inv_card)
+                pos_2_defensives[inv_card] = ['south_defense',inv_card.get_south()]
+        
+        self.defensive_moves['pos_2'] = pos_2_defensives
+
+
+    def pos_3_defense(self,cards):
+        ''' 3 will consider 0, 4 and 6 '''
+
+        pos_3_defensives= {}
+
+        pos_0_empty = False
+        pos_4_empty = False
+        pos_6_empty = False
+
+        #assess neighbours status 
+        if self.board_status['pos_0'][0] == 'empty':
+            pos_0_empty = True
+
+        if self.board_status['pos_4'][0] == 'empty':
+            pos_4_empty = True
+
+        if self.board_status['pos_6'][0] == 'empty':
+            pos_6_empty = True
+        
+
+        if pos_0_empty:
+            for inv_card in cards: # pass the cards under consideration for defensive moves - all if no attacks - only attack cards in event of offensive move available 
+                inv_card_index = self.inventory.index(inv_card)
+                pos_3_defensives[inv_card] = ['north_defense',inv_card.get_north()]
+
+        if pos_4_empty:
+            for inv_card in cards: 
+                inv_card_index = self.inventory.index(inv_card)
+                pos_3_defensives[inv_card] = ['east_defense',inv_card.get_east()]
+
+        if pos_6_empty:
+            for inv_card in cards: 
+                inv_card_index = self.inventory.index(inv_card)
+                pos_3_defensives[inv_card] = ['south_defense',inv_card.get_south()]
+
+        self.defensive_moves['pos_3'] = pos_3_defensives
+
+
+
+
             
+# what get's passed to the defensive methods is:
+#   if there are attacks we pass those to assess their defense relative to the attack
+#   if there are no attacks we pass all the possible spaces and pick the best move 
 
 
 
