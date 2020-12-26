@@ -399,9 +399,10 @@ class CPU():
                       'pos_7':self.pos_7_attack,
                       'pos_8':self.pos_8_attack}
         self.board_status = {}
-        self.spaces_in_play={}
-        self.occupied_spaces={}
-        self.possible_moves = {} #{'pos_0':{inv_0:[card power as int,score as int]}}
+        self.is_board_empty = False
+        self.spaces_in_play = {}
+        self.occupied_spaces = {}
+        self.possible_moves = {} # possible attacking moves in the vent of an attacking option 
         self.defensive_map={'pos_0':self.pos_0_defense, 
                       'pos_1':self.pos_1_defense,
                       'pos_2':self.pos_2_defense,
@@ -429,36 +430,38 @@ class CPU():
     def assess_board(self,board):
         self.board_status = board.ret_board_in_play()
         print()
-        #print ("Printing board in play from CPU class")
-        #print(self.board_status)
 
-
-
-        # if the board is empty - play a defensive opener
         empty = board.get_spaces_filled()
 
         if empty == 0: # need to address this 
-            print("Playing defensive card")
-            
-            # limit this to the 4 corners 
-
+            self.is_board_empty = True
+             
         for key,value in self.board_status.items():
             if value[1] == 'no_values':
                 self.spaces_in_play[key] = value
             else:
                 self.occupied_spaces[key] = value
 
-        #print()
         print("Available spaces from CPU class")
         print(self.spaces_in_play)
-        #print("Unavailable spaces from CPU class")
-        #print(self.occupied_spaces)
 
 
     def make_move(self,board):
         ''' this is the CPU brain '''
         # needs to read state of board 
         self.assess_board(board)
+
+        print("board empty check")
+        print(self.is_board_empty)
+
+        if self.is_board_empty:
+            # initial defensive move - one of the four corners
+            print("Board is empty therefore we play defensive in one of four corners") 
+            for option in ['pos_0','pos_2','pos_6','pos_8']:
+                print(option)
+                self.defensive_map[option](self.inventory)
+
+        pprint.pprint(self.defensive_moves)
 
 
         attack_options = self.spaces_in_play.keys()
@@ -472,7 +475,7 @@ class CPU():
             print(self.board_status)
 
 
-        # then here assess the possible moves and pick the best - ie produces flip with weakest card 
+        # then here assess the possible moves and pick the best - ie produces flip with wthe best subsequent defense
         print("printing possible moves")
         pprint.pprint(self.possible_moves)
 
@@ -488,9 +491,6 @@ class CPU():
 
         print("printing defensive sitrep")
         pprint.pprint(self.defensive_moves)
-
-
-        
 
 
     def pos_0_attack(self):
@@ -1287,7 +1287,7 @@ class CPU():
         if pos_3_empty:
             for inv_card in cards: 
                 inv_card_index = self.inventory.index(inv_card)
-                pos_3_defense[inv_card_index] = ['south_defense',inv_card.get_south()]
+                pos_3_defense[inv_card_index] = ['north_defense',inv_card.get_north()]
 
         if pos_7_empty:
             for inv_card in cards: 
@@ -1471,9 +1471,6 @@ red_player.inventory[4].set_north(9)
 red_player.inventory[4].set_south(9)
 red_player.inventory[4].set_west(9)
 
-
-
-board.accept_card('pos_7',blue_player.inventory[0])
 
 
 board.state_of_board()
