@@ -163,14 +163,7 @@ class Board():
                 board_dict[key] = [card,card.return_compass_values()]
 
         return board_dict 
-
-        
-        
-
-
-
-
-        
+ 
     def pos_0_combat(self):
         ''' 0 fights 1 and 3 '''
         # fight 1 
@@ -382,12 +375,10 @@ class Board():
 
 
 class CPU():
-    '''CPU class which play versus a player 
-    we'll need a play_defense() method also
-    for this need to have a score for the exposed edges'''
+    '''CPU class which plays versus a player '''
     colour = 'red'
 
-    def __init__(self):
+    def __init__(self,board):
         self.inventory=[]
         self.attack_map= {'pos_0':self.pos_0_attack, 
                       'pos_1':self.pos_1_attack,
@@ -398,6 +389,7 @@ class CPU():
                       'pos_6':self.pos_6_attack,
                       'pos_7':self.pos_7_attack,
                       'pos_8':self.pos_8_attack}
+        self.board = board # not delighted about this - need to refactor attributes and methods
         self.board_status = {}
         self.is_board_empty = False
         self.spaces_in_play = {}
@@ -427,11 +419,11 @@ class CPU():
     def get_player_colour(self):
         return self.colour
 
-    def assess_board(self,board):
+    def assess_board(self):
         self.board_status = board.ret_board_in_play()
         print()
 
-        empty = board.get_spaces_filled()
+        empty = self.board.get_spaces_filled()
 
         if empty == 0: # need to address this 
             self.is_board_empty = True
@@ -446,51 +438,121 @@ class CPU():
         print(self.spaces_in_play)
 
 
-    def make_move(self,board):
+    def make_move(self):
         ''' this is the CPU brain '''
         # needs to read state of board 
-        self.assess_board(board)
+        self.assess_board()
 
         print("board empty check")
         print(self.is_board_empty)
 
         if self.is_board_empty:
             # initial defensive move - one of the four corners
-            print("Board is empty therefore we play defensive in one of four corners") 
-            for option in ['pos_0','pos_2','pos_6','pos_8']:
+            print("Board is empty therefore we play defensive in one of four corners")
+            self.defensive_opener() 
+
+        else:
+            attack_options = self.spaces_in_play.keys()
+
+            print("looping through attack options")
+            for option in attack_options: 
+                print()
+                print(option)
+                self.attack_map[option]()
+                print("printing board status")
+                print(self.board_status)
+
+
+            # then here assess the possible moves and pick the best - ie produces flip with wthe best subsequent defense
+            print("printing possible moves")
+            pprint.pprint(self.possible_moves)
+
+            # extract the positions being considered in an attack scenario
+            # extrcat the cards that are potential attack candidates 
+            # pass them to the defesnive methods 
+
+            print("manually checking defensive methods")
+
+            for option in attack_options:
                 print(option)
                 self.defensive_map[option](self.inventory)
 
-        pprint.pprint(self.defensive_moves)
+            print("printing defensive sitrep")
+            pprint.pprint(self.defensive_moves)
 
-
-        attack_options = self.spaces_in_play.keys()
-
-        print("looping through attack options")
-        for option in attack_options: 
-            print()
+    def defensive_opener(self):
+        ''' if the CPU plays first it plays a defensive move in one of the four corners (least exposed poles)
+        biggest sum is played - with an inclusion of disparity to reduce imbalance eg 9 exposed along with a 2'''
+        corners= ['pos_0','pos_2','pos_6','pos_8']
+        
+        for option in corners:
             print(option)
-            self.attack_map[option]()
-            print("printing board status")
-            print(self.board_status)
-
-
-        # then here assess the possible moves and pick the best - ie produces flip with wthe best subsequent defense
-        print("printing possible moves")
-        pprint.pprint(self.possible_moves)
-
-        # extract the positions being considered in an attack scenario
-        # extrcat the cards that are potential attack candidates 
-        # pass them to the defesnive methods 
-
-        print("manually checking defensive methods")
-
-        for option in attack_options:
-            print(option)
-            self.defensive_map[option](self.inventory)
-
-        print("printing defensive sitrep")
+            self.defensive_map[option](self.inventory) # add all the options 
         pprint.pprint(self.defensive_moves)
+        
+        # first of all break down how to use/digest this info 
+        
+        sum_disparity = {} # card 
+
+        for option in corners:
+            pos_0 = self.defensive_moves[option] # loop through each   
+
+            pos_0_dict_1 = pos_0[0]
+            pos_0_dict_2 = pos_0[1]
+
+            print(pos_0_dict_1)
+            print(pos_0_dict_2)
+
+            for k in pos_0_dict_1.keys():
+                print(k)
+                pos_0_dict_1[k].append(pos_0_dict_2.get(k, {})) # add the dictionaries together for each inv card/position 
+
+            pprint.pprint(pos_0_dict_1)  
+
+            for k in pos_0_dict_1:
+                pos_0_dict_1[k] = [pos_0_dict_1[k][1] + pos_0_dict_1[k][2][1], abs(pos_0_dict_1[k][1] - pos_0_dict_1[k][2][1])] # calculate sum and disparity 
+
+            sum_disparity[option] = pos_0_dict_1
+
+        print(sum_disparity)
+
+        # select the biggest sum with the smallest disparity
+        # then play that card 
+
+        high_sums = {}
+
+        for option in corners:
+            print(max(sum_disparity[option], key=sum_disparity[option].get))
+            high_sums[option] = [max(sum_disparity[option], key=sum_disparity[option].get) ,sum_disparity[option][max(sum_disparity[option], key=sum_disparity[option].get)]]
+
+        print(high_sums)
+
+        print(high_sums.get('pos_0'))
+
+        
+        top_pick = high_sums['pos_0']
+        selection = {'pos_0':top_pick}
+
+        print(top_pick)
+        
+
+        for pos,card_sum in high_sums.items():
+            if card_sum[1][0] > top_pick[1][0]: 
+                top_pick = card_sum
+                selection = {pos:top_pick}
+
+        print(selection)
+
+        position_list = list(selection.keys())
+        position = position_list[0]
+        
+        card_index = selection[position][0]
+        card = self.inventory[selection[position][0]]
+
+        # play the card 
+        print(self.board.ret_board_in_play())
+        self.board.accept_card(position,card)
+        print(self.board.ret_board_in_play())
 
 
     def pos_0_attack(self):
@@ -1386,10 +1448,12 @@ class CPU():
 # check if deck builds and we have alternating colours - yes 
 deck_test = Deck()
 
+# initalise board 
+board = Board()
 
 # define some players 
 blue_player = Player()
-red_player = CPU()
+red_player = CPU(board)
 
 deck_test.deal_to_player(blue_player)
 deck_test.deal_to_player(red_player)
@@ -1404,8 +1468,7 @@ deck_test.deal_to_player(red_player)
 
 # test if our attack method works? 
 
-# initalise board 
-board = Board()
+
 
 
 # checks - max out blue card stats - minimise red card stats and test all combat
@@ -1442,34 +1505,34 @@ blue_player.inventory[4].set_east(1)
 
 # red card - these should be defeated by blue - minimise stats for debugging 
 print("red before")
-red_player.inventory[1].show_compass_values()
-red_player.inventory[1].set_east(9)
-red_player.inventory[1].set_north(9)
-red_player.inventory[1].set_south(9)
-red_player.inventory[1].set_west(9)
+#red_player.inventory[1].show_compass_values()
+#red_player.inventory[1].set_east(9)
+#red_player.inventory[1].set_north(9)
+#red_player.inventory[1].set_south(9)
+#red_player.inventory[1].set_west(9)
+#
+#print("red after")
+#red_player.inventory[1].show_compass_values()
 
-print("red after")
-red_player.inventory[1].show_compass_values()
-
-red_player.inventory[0].set_east(9)
-red_player.inventory[0].set_north(9)
-red_player.inventory[0].set_south(9)
-red_player.inventory[0].set_west(9)
-
-red_player.inventory[2].set_east(9)
-red_player.inventory[2].set_north(9)
-red_player.inventory[2].set_south(9)
-red_player.inventory[2].set_west(9)
-
-red_player.inventory[3].set_east(9)
-red_player.inventory[3].set_north(9)
-red_player.inventory[3].set_south(9)
-red_player.inventory[3].set_west(9)
-
-red_player.inventory[4].set_east(9)
-red_player.inventory[4].set_north(9)
-red_player.inventory[4].set_south(9)
-red_player.inventory[4].set_west(9)
+#red_player.inventory[0].set_east(9)
+#red_player.inventory[0].set_north(9)
+#red_player.inventory[0].set_south(9)
+#red_player.inventory[0].set_west(9)
+#
+#red_player.inventory[2].set_east(9)
+#red_player.inventory[2].set_north(9)
+#red_player.inventory[2].set_south(9)
+#red_player.inventory[2].set_west(9)
+#
+#red_player.inventory[3].set_east(9)
+#red_player.inventory[3].set_north(9)
+#red_player.inventory[3].set_south(9)
+#red_player.inventory[3].set_west(9)
+#
+#red_player.inventory[4].set_east(9)
+#red_player.inventory[4].set_north(9)
+#red_player.inventory[4].set_south(9)
+#red_player.inventory[4].set_west(9)
 
 
 
@@ -1477,5 +1540,6 @@ board.state_of_board()
 
 print(board.ret_board_in_play())
 
-red_player.make_move(board)
+red_player.make_move()
 
+print(board.ret_board_in_play())
