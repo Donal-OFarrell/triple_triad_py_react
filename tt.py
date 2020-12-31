@@ -60,8 +60,17 @@ class Card():
 class Player():
     '''Player class AKA Squall - (i.e. the player playing vs cpu)'''
     colour = 'blue'
-    def __init__(self):
+    def __init__(self,board):
         self.inventory = [] 
+        self.board = board 
+
+    def play_card(self,position,card,card_index):
+        ''' Plays a card for the player.
+        Complies with the board rules by invoking board.accept_card().
+        After a card id played it is removed from the players inventory. '''
+        self.board.accept_card(position,card) # play the card 
+        self.inventory.pop(card_index) # remove this card from the Players inventory 
+
 
     def get_player_colour(self):
         return self.colour
@@ -419,6 +428,16 @@ class CPU():
     def get_player_colour(self):
         return self.colour
 
+
+    def play_card(self,position,card,card_index):
+        ''' CPU play card method.
+        It will place the card on the board complying with the boards rules 
+        (this is dictated by invoking boards accept card method).
+        It will then remove that card from the CPUs inventory'''
+        self.board.accept_card(position,card) # play the card 
+        self.inventory.pop(card_index) # remove this card from the CPU inventory 
+
+
     def assess_board(self):
         self.board_status = board.ret_board_in_play()
         print()
@@ -541,17 +560,21 @@ class CPU():
                 top_pick = card_sum
                 selection = {pos:top_pick}
 
+        print("after selection")
         print(selection)
+
 
         position_list = list(selection.keys())
         position = position_list[0]
+        print("position",position)
         
         card_index = selection[position][0]
+        print("card_index",card_index)
         card = self.inventory[selection[position][0]]
 
         # play the card 
         print(self.board.ret_board_in_play())
-        self.board.accept_card(position,card)
+        self.play_card(position,card,card_index)
         print(self.board.ret_board_in_play())
 
 
@@ -1452,7 +1475,7 @@ deck_test = Deck()
 board = Board()
 
 # define some players 
-blue_player = Player()
+blue_player = Player(board)
 red_player = CPU(board)
 
 deck_test.deal_to_player(blue_player)
@@ -1540,6 +1563,12 @@ board.state_of_board()
 
 print(board.ret_board_in_play())
 
+print("Inventory before")
+red_player.show_inventory()
+
 red_player.make_move()
+
+print("Inventory after")
+red_player.show_inventory()
 
 print(board.ret_board_in_play())
