@@ -55,10 +55,7 @@ class Card():
 
     def card_power(self):
         ''' defines the power of a card by summing the poles '''
-        return { "north":self.north,
-        "south":self.south,
-        "east": self.east, 
-        "west": self.west }
+        return self.north + self.south + self.east + self.west 
 
 class Player():
     '''Player class AKA Squall - (i.e. the player playing vs cpu)'''
@@ -573,8 +570,52 @@ class CPU():
                 print()
                 print("now need to select the card with the best defense")
 
-                # if defense N/A - play lowest value card or any card that gets the job done
+                # if defense N/A - play lowest value card or any card that gets the job done - in that case use card with lowest power - revert get power
+                # I suspect there may be more examples of this - but you'd have a position with no defense required - pick this one - over one with defense required 
+
+                # if no info - then we jknow that defense doesnt need to be considered  
+                # prioritise this choice
+                # play card with lowest power (not mathematical power - but as in game power) (sum from card_power method)
+
+                pos_to_attack = '' # the position to attack in the case of no defense to consider 
+
+                for position in valid_attack_keys:
+                    if self.defensive_moves[position] == []: # if it's an empty array for that position - 
+                        pos_to_attack = position # then thats' the position we attack
+                        break # exit the loop on satisfying above 
+                
+                
+
+                if pos_to_attack != '': # then extract the powers of the cards and choose the lowest - then play this one 
+                    cards=valid_attacks[pos_to_attack]
+                    print("cards",cards)
+                    card_keys = list(cards.keys())
+                    print("card_keys",card_keys)
+                    lowest_power_card = valid_attacks[pos_to_attack][card_keys[0]] # select the first one 
+                    print("lowest_power_card",lowest_power_card)
+                    power_of_lowest = lowest_power_card[0]
+                    print("power_of_lowest",power_of_lowest)
+
+                    no_def_attack = {pos_to_attack:''} # placeholder for the positiona nd the ventual card to attack 
+                    print("checking cards after pos_to_attack")
+                    for card in card_keys:
+                        if valid_attacks[pos_to_attack][card][0] < power_of_lowest:
+                            lowest_power_card = valid_attacks[pos_to_attack][card]
+
+                        no_def_attack = {pos_to_attack:[card,lowest_power_card]}
+
+                print("checking no_def_attack")
+                print(no_def_attack)
+
+
+                
+                
+
+                 
+
+                 
                 # else pick the card with the best d - that means another bit of logic here 
+                #### STOPPED HERE 
 
             # extract the positions being considered in an attack scenario
             # extrcat the cards that are potential attack candidates 
