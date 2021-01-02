@@ -55,7 +55,10 @@ class Card():
 
     def card_power(self):
         ''' defines the power of a card by summing the poles '''
-        return self.north + self.south + self.east + self.west 
+        return { "north":self.north,
+        "south":self.south,
+        "east": self.east, 
+        "west": self.west }
 
 class Player():
     '''Player class AKA Squall - (i.e. the player playing vs cpu)'''
@@ -169,7 +172,7 @@ class Board():
             if card == 'empty':
                 board_dict[key] = ['empty','no_values']
             else:
-                board_dict[key] = [card,card.return_compass_values()]
+                board_dict[key] = [card,card.return_compass_values(),card.get_colour()]
 
         return board_dict 
  
@@ -403,7 +406,7 @@ class CPU():
         self.is_board_empty = False
         self.spaces_in_play = {}
         self.occupied_spaces = {}
-        self.possible_moves = {} # possible attacking moves in the vent of an attacking option 
+        self.possible_moves = {} # possible attacking moves in the event of an attacking option 
         self.defensive_map={'pos_0':self.pos_0_defense, 
                       'pos_1':self.pos_1_defense,
                       'pos_2':self.pos_2_defense,
@@ -486,18 +489,112 @@ class CPU():
             print("printing possible moves")
             pprint.pprint(self.possible_moves)
 
+            print()
+            print("Here the top attacking options need to be selected")
+
+            valid_attacks = {}
+
+
+           
+
+            for option in attack_options:
+                if self.possible_moves[option] != {}:
+                    valid_attacks[option] = self.possible_moves[option]
+
+            print("valid_attacks")
+            pprint.pprint(valid_attacks)
+
+            if valid_attacks != {}:
+
+                # now here we need to find out if there are doubles/triples
+                print("double triple checks")
+                valid_attack_positions = valid_attacks.keys()
+
+                print("valid_attack_positions",valid_attack_positions)
+
+                pos_dubs_trips={}
+                doubles_triples={}
+                triple_quad_bool = False
+                double_bool = False
+
+
+                for pos in valid_attack_positions:
+                    attacks = valid_attacks[pos] # attacks for that position 
+                    print("attacks",attacks)
+                    print(type(attacks))
+                    #for i in range(len(list(attacks.keys()))): # extract all of the inv cards - getting key error every now and then
+                    inv_card_keys = list(attacks.keys())
+                    for key in inv_card_keys: 
+                        print(key)
+                        attack_values = attacks[key]
+                        if attack_values[1] > 2:
+                            if double_bool:
+                                doubles_triples = {} # if there has been doubles already then erase them
+                            doubles_triples[key] = attack_values 
+                            triple_quad_bool = True # if we have triples or quads - ignore doubles 
+                        if attack_values[1] > 1 and triple_quad_bool == False: # otherwise we have doubles so add them in - but this could occur later??? 
+                             doubles_triples[key] = attack_values
+                             double_bool = True    
+                    if doubles_triples != {}:
+                        pos_dubs_trips[pos] = doubles_triples
+                    doubles_triples = {}
+
+                print("check before after")
+                pprint.pprint(valid_attacks)
+                print("changed to")
+                pprint.pprint(pos_dubs_trips) # this is the attacks that are greater than singles 
+
+                # if the above has been altered then there are doubles or triples and we should ignore the singles and update valid_attacks 
+                if pos_dubs_trips != {}:
+                     valid_attacks = pos_dubs_trips
+
+                print("Check we have changed valid_attacks")
+                pprint.pprint(valid_attacks)
+                            
+
+                print()
+                print("from here the defensive footprint of the attacking options need to be assessed")
+                # pass valid attacks keys 
+
+                valid_attack_keys = list(valid_attacks.keys())
+
+                print("check valid attack keys",valid_attack_keys)
+
+
+                print("defensive_moves before the change", self.defensive_moves)
+
+                for position in valid_attack_keys:
+                    print(position)
+                    self.defensive_map[position](self.inventory) # this should invoke the method - which should then popluate defensive_moves
+
+                print("defensive_moves check here")
+                pprint.pprint(self.defensive_moves) # in the case of the pos 1 triple - there is no defense - pick any card that gets the job done - basically a no defense case
+                
+                print()
+                print("now need to select the card with the best defense")
+
+                # if defense N/A - play lowest value card or any card that gets the job done
+                # else pick the card with the best d - that means another bit of logic here 
+
             # extract the positions being considered in an attack scenario
             # extrcat the cards that are potential attack candidates 
             # pass them to the defesnive methods 
 
-            print("manually checking defensive methods")
+            # so this is the defensive method - seperate to attack stuff - use this in the event of no attacks 
+            else:
+                print()
+                print()
+                print("manually checking defensive methods")
 
-            for option in attack_options:
-                print(option)
-                self.defensive_map[option](self.inventory)
+                for option in attack_options:
+                    print(option)
+                    self.defensive_map[option](self.inventory)
 
-            print("printing defensive sitrep")
-            pprint.pprint(self.defensive_moves)
+                print("printing defensive sitrep")
+                pprint.pprint(self.defensive_moves)
+
+                 
+
 
     def defensive_opener(self):
         ''' if the CPU plays first it plays a defensive move in one of the four corners (least exposed poles)
@@ -576,6 +673,9 @@ class CPU():
         print(self.board.ret_board_in_play())
         self.play_card(position,card,card_index)
         print(self.board.ret_board_in_play())
+
+        # revert defensive_moves to {}
+        self.defensive_moves = {}
 
 
     def pos_0_attack(self):
@@ -1127,6 +1227,8 @@ class CPU():
                 pos_3_defense[inv_card_index]=['south_defense',inv_card.get_south()]
 
         pos_0_defensives =[pos_1_defense,pos_3_defense]
+        while {} in pos_0_defensives:
+            pos_0_defensives.remove({})
 
         self.defensive_moves['pos_0'] = pos_0_defensives
 
@@ -1169,7 +1271,9 @@ class CPU():
                 inv_card_index = self.inventory.index(inv_card)
                 pos_4_defense[inv_card_index]=['south_defense',inv_card.get_south()]
 
-        pos_1_defensives =[pos_0_defense, pos_2_defense, pos_4_defense]
+        pos_1_defensives =[pos_0_defense, pos_2_defense, pos_4_defense] # if one of these are empty it's still included - below will remove the empties 
+        while {} in pos_1_defensives:
+            pos_1_defensives.remove({})
 
         self.defensive_moves['pos_1'] = pos_1_defensives
 
@@ -1204,7 +1308,9 @@ class CPU():
                 pos_5_defense[inv_card_index]=['south_defense',inv_card.get_south()]
 
         pos_2_defensives =[pos_1_defense, pos_5_defense]
-        
+        while {} in pos_2_defensives:
+            pos_2_defensives.remove({})
+
         self.defensive_moves['pos_2'] = pos_2_defensives
 
 
@@ -1249,6 +1355,8 @@ class CPU():
 
 
         pos_3_defensives =[pos_0_defense, pos_4_defense, pos_6_defense]
+        while {} in pos_3_defensives:
+            pos_3_defensives.remove({})
         
         self.defensive_moves['pos_3'] = pos_3_defensives
 
@@ -1302,6 +1410,8 @@ class CPU():
                 pos_7_defense[inv_card_index] = ['south_defense',inv_card.get_south()]
 
         pos_4_defensives =[pos_1_defense, pos_3_defense, pos_5_defense, pos_7_defense]
+        while {} in pos_4_defensives:
+            pos_4_defensives.remove({})
         
         self.defensive_moves['pos_4'] = pos_4_defensives
 
@@ -1347,6 +1457,8 @@ class CPU():
 
 
         pos_5_defensives =[pos_2_defense, pos_4_defense, pos_8_defense]
+        while {} in pos_5_defensives:
+            pos_5_defensives.remove({})
         
         self.defensive_moves['pos_5'] = pos_5_defensives
 
@@ -1380,6 +1492,8 @@ class CPU():
                 pos_7_defense[inv_card_index] = ['east_defense',inv_card.get_east()]
 
         pos_6_defensives =[pos_3_defense, pos_7_defense]
+        while {} in pos_6_defensives:
+            pos_6_defensives.remove({})
         
         self.defensive_moves['pos_6'] = pos_6_defensives
 
@@ -1424,6 +1538,8 @@ class CPU():
                 pos_8_defense[inv_card_index] = ['east_defense',inv_card.get_east()]
 
         pos_7_defensives =[pos_6_defense, pos_4_defense, pos_8_defense]
+        while {} in pos_7_defensives:
+            pos_7_defensives.remove({})
         
         self.defensive_moves['pos_7'] = pos_7_defensives
 
@@ -1457,6 +1573,8 @@ class CPU():
                 pos_7_defense[inv_card_index] = ['west_defense',inv_card.get_west()]
 
         pos_8_defensives =[pos_5_defense, pos_7_defense]
+        while {} in pos_8_defensives:
+            pos_8_defensives.remove({})
         
         self.defensive_moves['pos_8'] = pos_8_defensives
           
@@ -1565,6 +1683,11 @@ print(board.ret_board_in_play())
 
 print("Inventory before")
 red_player.show_inventory()
+
+
+blue_player.play_card('pos_0',blue_player.inventory[4],4)
+blue_player.play_card('pos_2',blue_player.inventory[3],3)
+blue_player.play_card('pos_4',blue_player.inventory[2],2)
 
 red_player.make_move()
 
