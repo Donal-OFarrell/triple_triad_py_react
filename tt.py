@@ -604,18 +604,49 @@ class CPU():
 
                         no_def_attack = {pos_to_attack:[card,lowest_power_card]}
 
-                print("checking no_def_attack")
-                print(no_def_attack)
+                    print("checking no_def_attack")
+                    print(no_def_attack)
 
+                    no_def_pos = list(no_def_attack.keys())
+                    no_def_pos = no_def_pos[0]
+                    print("no_def_pos",no_def_pos)
+                    no_def_card_index = no_def_attack[no_def_pos][1][1]
+                    print("no_def_card_index",no_def_card_index)
+                    no_def_card = self.inventory[no_def_card_index]
+                    print("no_def_card",no_def_card)
 
-                
-                
+                    # add the actual attack command 
+                    pprint.pprint(self.board.ret_board_in_play())
+                    self.play_card(no_def_pos,no_def_card,no_def_card_index)
+                    pprint.pprint(self.board.ret_board_in_play())
 
-                 
-
-                 
+                   
                 # else pick the card with the best d - that means another bit of logic here 
-                #### STOPPED HERE 
+                #### STOPPED HERE
+                else: # there are no defense free attacks 
+                    print("arrived at attacks with defensive considerations")
+                    pprint.pprint(valid_attacks)
+                    
+                    # do the defensive stuff 
+                    # have we already popluated defensive moves above? 
+                    print("defensive moves in a situation where defense is important during an attack")
+                    pprint.pprint(self.defensive_moves)
+
+                    # need to loop through the defensive stuff 
+
+
+                    
+                    
+                    
+
+                    # 3 cases - (with some varaiataion based on wheteher there are multiple positions)
+                    # case 1 - one pole to protect - wait select for one pole to protect first - so least amount to worry about 
+                    # pick the highest defense
+
+                    # case 2 - 2 poles - pick highest sum with lowest disparity - ( a problem not solved yet)
+
+                    # case 3 3 poles - same as above - but disparity now becomes trickier with 3 values 
+
 
             # extract the positions being considered in an attack scenario
             # extrcat the cards that are potential attack candidates 
@@ -634,8 +665,7 @@ class CPU():
                 print("printing defensive sitrep")
                 pprint.pprint(self.defensive_moves)
 
-                 
-
+                
 
     def defensive_opener(self):
         ''' if the CPU plays first it plays a defensive move in one of the four corners (least exposed poles)
@@ -654,7 +684,7 @@ class CPU():
         for option in corners:
             pos_0 = self.defensive_moves[option] # loop through each   
 
-            pos_0_dict_1 = pos_0[0]
+            pos_0_dict_1 = pos_0[0] 
             pos_0_dict_2 = pos_0[1]
 
             print(pos_0_dict_1)
@@ -667,37 +697,43 @@ class CPU():
             pprint.pprint(pos_0_dict_1)  
 
             for k in pos_0_dict_1:
-                pos_0_dict_1[k] = [pos_0_dict_1[k][1] + pos_0_dict_1[k][2][1], abs(pos_0_dict_1[k][1] - pos_0_dict_1[k][2][1])] # calculate sum and disparity 
+                sum_dispar = [pos_0_dict_1[k][1] + pos_0_dict_1[k][2][1], abs(pos_0_dict_1[k][1] - pos_0_dict_1[k][2][1])] # calculate sum and disparity
+                print("sum_dispar",sum_dispar)
+                pos_0_dict_1[k] = sum_dispar[0] - sum_dispar[1] # sum - disparity is ther ultimate winner - highest sum and lowest disparity is the best card 
 
             sum_disparity[option] = pos_0_dict_1
 
+        print("***check sum disaprity")
         print(sum_disparity)
 
-        # select the biggest sum with the smallest disparity
+        # select the card with the largest overall int score 
         # then play that card 
 
         high_sums = {}
 
         for option in corners:
+            print("sum_disparity[option]",sum_disparity[option])
             print(max(sum_disparity[option], key=sum_disparity[option].get))
+            #high_sums[option] = [max(sum_disparity[option], key=sum_disparity[option].get)]
             high_sums[option] = [max(sum_disparity[option], key=sum_disparity[option].get) ,sum_disparity[option][max(sum_disparity[option], key=sum_disparity[option].get)]]
 
+        print("***high_sums***")
         print(high_sums)
 
-        print(high_sums.get('pos_0'))
 
         
-        top_pick = high_sums['pos_0']
-        selection = {'pos_0':top_pick}
+        top_pick = high_sums['pos_0'] # initiate top pick 
+        selection = {'pos_0':top_pick} # initiate selection 
 
+        print("***top_pick***")
         print(top_pick)
         
 
         for pos,card_sum in high_sums.items():
-            if card_sum[1][0] > top_pick[1][0]: 
+            if card_sum[1] > top_pick[1]: 
                 top_pick = card_sum
                 selection = {pos:top_pick}
-
+#
         print("after selection")
         print(selection)
 
@@ -709,12 +745,13 @@ class CPU():
         card_index = selection[position][0]
         print("card_index",card_index)
         card = self.inventory[selection[position][0]]
-
+        print("card",card)
+#
         # play the card 
         print(self.board.ret_board_in_play())
         self.play_card(position,card,card_index)
         print(self.board.ret_board_in_play())
-
+#
         # revert defensive_moves to {}
         self.defensive_moves = {}
 
@@ -1726,9 +1763,9 @@ print("Inventory before")
 red_player.show_inventory()
 
 
-blue_player.play_card('pos_0',blue_player.inventory[4],4)
-blue_player.play_card('pos_2',blue_player.inventory[3],3)
-blue_player.play_card('pos_4',blue_player.inventory[2],2)
+#blue_player.play_card('pos_3',blue_player.inventory[4],4)
+#blue_player.play_card('pos_2',blue_player.inventory[3],3)
+
 
 red_player.make_move()
 
