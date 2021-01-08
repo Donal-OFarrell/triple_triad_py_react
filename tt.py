@@ -633,26 +633,74 @@ class CPU():
                     pprint.pprint(self.defensive_moves)
 
                     # need to loop through the defensive stuff 
+                    # sum the poles together 
+                    # then calculate the disparity => pole - pole
+                    # and finally sum - disparity 
+
+                    # need the keys from defensive moves first 
+                    POI = list(self.defensive_moves.keys()) # positions of interest for attack/defense 
+
+                    sections = []
+
+                    concatenated_positions = {}
+
+                    for pos in POI: 
+                        # can have up to three positions to sum
+                        section = self.defensive_moves[pos] # each position 
+                        print(pos,"section",section) 
+                        print(type(section))
+
+                        # if section.length() > 1
+                        if len(section) > 1:
+                            # get the keys for one
+                            inv_cards = list(section[0].keys())
+                            print("inv_cards",inv_cards)
+                            
+                            # define base dictionary 
+                            dict_1 = section[0]
+
+                            if len(section) == 2:
+                                dict_2 = section[1] # define the second dictionary
+                                for index in inv_cards:
+                                    dict_1[index].append(dict_2.get(index, {})) # add the dictionaries together for each inv card/position
+
+                            if len(section) == 3:
+                                dict_2 = section[1] # define the second dictionary
+                                dict_3 = section[2] # define the third dictionary
+
+                                for index in inv_cards:
+                                    dict_1[index].append(dict_2.get(index, {})) 
+
+                                for index in inv_cards:
+                                    dict_1[index].append(dict_3.get(index, {})) # add all of the dictionaries together one after the other 
+
+                            concatenated_positions[pos] = dict_1
+
+                    print("concatenated_positions")
+                    pprint.pprint(concatenated_positions)
+
+                    # if there have been concatenations for one or more positions 
+                    # replace this key in self.defensive_moves 
+
+                    for pos in concatenated_positions.keys():
+                        self.defensive_moves[pos]  = concatenated_positions[pos] 
+
+                    print("self.defensive_moves after the change")
+
+                    pprint.pprint(self.defensive_moves)
 
 
-                    
-                    
-                    
 
                     # 3 cases - (with some varaiataion based on wheteher there are multiple positions)
                     # case 1 - one pole to protect - wait select for one pole to protect first - so least amount to worry about 
                     # pick the highest defense
 
-                    # case 2 - 2 poles - pick highest sum with lowest disparity - ( a problem not solved yet)
+                    # case 2 - 2 poles - pick highest sum-disparity
 
-                    # case 3 3 poles - same as above - but disparity now becomes trickier with 3 values 
+                    # case 3 3 poles - same as above - but sum is total of 3 and disparity is the gap between end members (highest and lowest pole) 
+ 
 
-
-            # extract the positions being considered in an attack scenario
-            # extrcat the cards that are potential attack candidates 
-            # pass them to the defesnive methods 
-
-            # so this is the defensive method - seperate to attack stuff - use this in the event of no attacks 
+            # In the event of no availabe attacks 
             else:
                 print()
                 print()
@@ -687,8 +735,8 @@ class CPU():
             pos_0_dict_1 = pos_0[0] 
             pos_0_dict_2 = pos_0[1]
 
-            print(pos_0_dict_1)
-            print(pos_0_dict_2)
+            print("pos_0_dict_1",pos_0_dict_1)
+            print("pos_0_dict_2",pos_0_dict_2)
 
             for k in pos_0_dict_1.keys():
                 print(k)
@@ -1763,7 +1811,7 @@ print("Inventory before")
 red_player.show_inventory()
 
 
-#blue_player.play_card('pos_3',blue_player.inventory[4],4)
+blue_player.play_card('pos_3',blue_player.inventory[4],4)
 #blue_player.play_card('pos_2',blue_player.inventory[3],3)
 
 
