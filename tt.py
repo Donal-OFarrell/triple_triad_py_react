@@ -664,6 +664,11 @@ class CPU():
                                 for index in inv_cards:
                                     dict_1[index].append(dict_2.get(index, {})) # add the dictionaries together for each inv card/position
 
+                                for index in inv_cards:
+                                    sum_dispar = [dict_1[index][1] + dict_1[index][2][1], abs(dict_1[index][1] - dict_1[index][2][1])] # calculate sum and disparity
+                                    print("sum_dispar",sum_dispar)
+                                    dict_1[index] = sum_dispar[0] - sum_dispar[1] # sum - disparity is ther ultimate winner - highest sum and lowest disparity is the best card 
+
                             if len(section) == 3:
                                 dict_2 = section[1] # define the second dictionary
                                 dict_3 = section[2] # define the third dictionary
@@ -673,11 +678,33 @@ class CPU():
 
                                 for index in inv_cards:
                                     dict_1[index].append(dict_3.get(index, {})) # add all of the dictionaries together one after the other 
+                                
+                                print("checking dict 1 in a 3 pole situation")
+                                pprint.pprint(dict_1)
 
+                                # initially need to find the highest and lowest end member poles for calculations
+                                # for index in inv_cards:
+                                    # add to temp array the following values 
+                                    # [1], [2][1], [3][1]
+                                    # calc max and min ==> minus these two figures for disparity
+                                    # sum all 3 for sum 
+                                    # calc sum - disparity  
+                                for index in inv_cards:
+                                    pole_values = [dict_1[index][1], dict_1[index][2][1], dict_1[index][3][1]]
+                                    print("pole_values", pole_values) 
+                                    max_pole = max(pole_values)
+                                    min_pole = min(pole_values)
+                                    disparity = max_pole - min_pole
+                                    poles_sum = sum(pole_values)
+                                    sum_minus_disparity = poles_sum - disparity
+                                    # now assign it 
+                                    dict_1[index] = sum_minus_disparity
+                                       
+                            
                             concatenated_positions[pos] = dict_1
 
                     print("concatenated_positions")
-                    pprint.pprint(concatenated_positions)
+                    pprint.pprint(concatenated_positions) 
 
                     # if there have been concatenations for one or more positions 
                     # replace this key in self.defensive_moves 
@@ -688,6 +715,14 @@ class CPU():
                     print("self.defensive_moves after the change")
 
                     pprint.pprint(self.defensive_moves)
+
+                    # calc overall sums 
+
+
+                    # prioritise 1 pole to defend 
+
+
+
 
 
 
@@ -1812,7 +1847,7 @@ red_player.show_inventory()
 
 
 blue_player.play_card('pos_3',blue_player.inventory[4],4)
-#blue_player.play_card('pos_2',blue_player.inventory[3],3)
+#blue_player.play_card('pos_0',blue_player.inventory[3],3)
 
 
 red_player.make_move()
