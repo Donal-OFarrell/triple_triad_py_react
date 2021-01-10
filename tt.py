@@ -820,7 +820,7 @@ class CPU():
  
 
             # In the event of no availabe attacks 
-            else:
+            else: #
                 print()
                 print()
                 print("manually checking defensive methods")
@@ -831,6 +831,178 @@ class CPU():
 
                 print("printing defensive sitrep")
                 pprint.pprint(self.defensive_moves)
+
+                POI = list(self.defensive_moves.keys()) # positions of interest for attack/defense
+
+                sections = []
+
+                concatenated_positions = {}
+
+                for pos in POI: 
+                    # can have up to three positions to sum
+                    section = self.defensive_moves[pos] # each position 
+                    print(pos,"section",section) 
+                    print(type(section))
+
+                    # if section.length() > 1
+                    if len(section) > 1:
+                        # get the keys for one
+                        inv_cards = list(section[0].keys())
+                        print("inv_cards",inv_cards)
+                        
+                        # define base dictionary 
+                        dict_1 = section[0]
+
+                        if len(section) == 2:
+                            dict_2 = section[1] # define the second dictionary
+                            for index in inv_cards:
+                                dict_1[index].append(dict_2.get(index, {})) # add the dictionaries together for each inv card/position
+
+                            for index in inv_cards:
+                                sum_dispar = [dict_1[index][1] + dict_1[index][2][1], abs(dict_1[index][1] - dict_1[index][2][1])] # calculate sum and disparity
+                                print("sum_dispar",sum_dispar)
+                                dict_1[index] = [sum_dispar[0] - sum_dispar[1],2] # sum - disparity is ther ultimate winner - highest sum and lowest disparity is the best card - alos add division factor
+
+                        if len(section) == 3:
+                            dict_2 = section[1] # define the second dictionary
+                            dict_3 = section[2] # define the third dictionary
+
+                            for index in inv_cards:
+                                dict_1[index].append(dict_2.get(index, {})) 
+
+                            for index in inv_cards:
+                                dict_1[index].append(dict_3.get(index, {})) # add all of the dictionaries together one after the other 
+                            
+                            print("checking dict 1 in a 3 pole situation")
+                            pprint.pprint(dict_1)
+
+                            # initially need to find the highest and lowest end member poles for calculations
+                            # for index in inv_cards:
+                                # add to temp array the following values 
+                                # [1], [2][1], [3][1]
+                                # calc max and min ==> minus these two figures for disparity
+                                # sum all 3 for sum 
+                                # calc sum - disparity  
+                            for index in inv_cards:
+                                pole_values = [dict_1[index][1], dict_1[index][2][1], dict_1[index][3][1]]
+                                print("pole_values", pole_values) 
+                                max_pole = max(pole_values)
+                                min_pole = min(pole_values)
+                                disparity = max_pole - min_pole
+                                poles_sum = sum(pole_values)
+                                sum_minus_disparity = poles_sum - disparity
+                                # now assign it 
+                                dict_1[index] = [sum_minus_disparity,3] #also add division factor 
+                                    
+                        
+                        concatenated_positions[pos] = dict_1
+
+                print("concatenated_positions for defesnive only")
+                pprint.pprint(concatenated_positions)
+
+                for pos in concatenated_positions.keys():
+                    self.defensive_moves[pos]  = concatenated_positions[pos] 
+
+                print("self.defensive_moves after the change")
+
+                pprint.pprint(self.defensive_moves)
+
+                is_list = type([])
+                is_dict = type({})
+                print("is_list",is_list)
+                print("is_dict",is_dict)
+
+                for pos in self.defensive_moves.keys():
+                    # loop through the intended positions to attack
+                    intended_attacks = self.defensive_moves[pos] # aka section from above - will need to refactor all this significantly - lots of redundant code in this method
+                    if type(intended_attacks) == is_list:
+                        # get max 
+                        print("intended_attacks single array case",intended_attacks)
+                        inv_cards = list(intended_attacks[0].keys())
+                        print("inv_cards",inv_cards)
+                        #max_val = {inv_cards[0]:intended_attacks[inv_cards[0]]} # need to get this right
+                        
+                        #print("inv_cards[0]",inv_cards[0])
+                        #print("*-*intended_attacks[0][inv_cards[0]][1]*-*",intended_attacks[0][inv_cards[0]][1])
+                        max_val = [inv_cards[0],intended_attacks[0][inv_cards[0]][1]]
+                        print("max_val", max_val)
+                        
+                        for index in inv_cards:
+                            if intended_attacks[0][index][1] > max_val[1]:
+                                max_val = [index,intended_attacks[0][index][1]]
+                                print("max val after change in array")
+                                print(max_val)
+                            # now loop through and find the maximum 
+
+                        
+                        self.defensive_moves[pos] = max_val
+                        print("defensive moves after changes")
+                        pprint.pprint(self.defensive_moves)
+
+                    
+                    elif type(intended_attacks) == is_dict:
+                        # get max and divide by appropriate value 
+                        print("intended_attacks dict case",intended_attacks)
+                        inv_cards = list(intended_attacks.keys())
+                        print("inv cards dict",inv_cards)
+                        division_factor = intended_attacks[inv_cards[0]][1] # define division factor (how many poles to divide by)
+                        print("division factor", division_factor)
+
+                        max_val = [inv_cards[0],intended_attacks[inv_cards[0]][0]]
+                        print("max val dict case")
+
+                        # loop through and get max
+                        first_highest = True
+                        for index in inv_cards:
+                            if intended_attacks[index][0] > intended_attacks[inv_cards[0]][0]:
+                                first_highest = False
+                                print("checking dict max val value",intended_attacks[index][0])
+                                print("checking division factor",division_factor)
+                                print("checking calculation",intended_attacks[index][0]/division_factor)
+                                max_val = [index, intended_attacks[index][0]/division_factor] # divide by divsion factor
+                        
+                        if first_highest:
+                            max_val = [inv_cards[0],intended_attacks[inv_cards[0]][0]/division_factor] # still need to divide the entry if the first is highest
+                               
+
+                        self.defensive_moves[pos] = max_val
+                        print("defensive moves after changes in dict case")
+                        pprint.pprint(self.defensive_moves)
+                         
+
+                # play the appropriate card and revert defensive_moves and possible_moves to {}                 
+                print("***making top pick for defense***")
+
+
+                positions = list(self.defensive_moves.keys())
+
+                top_pick= self.defensive_moves[positions[0]][1]
+                selection = {positions[0]: self.defensive_moves[positions[0]]}
+
+                print("top_pick",top_pick)
+                print("selection",selection)
+
+                for pos in positions:
+                    if self.defensive_moves[pos][1] > top_pick:
+                        top_pick = self.defensive_moves[pos][1]
+                        selection = {pos:self.defensive_moves[pos]}
+                    
+                position_list = list(selection.keys())
+                position = position_list[0]
+                print("position",position)
+                
+                card_index = selection[position][0]
+                print("card_index",card_index)
+                card = self.inventory[selection[position][0]]
+                print("card",card)
+        #
+                # play the card 
+                print(self.board.ret_board_in_play())
+                self.play_card(position,card,card_index)
+                print(self.board.ret_board_in_play())
+        #
+                # revert defensive_moves to {}
+                self.defensive_moves = {}
 
                 
 
@@ -1883,10 +2055,10 @@ blue_player.inventory[3].set_south(1)
 blue_player.inventory[3].set_north(1)
 blue_player.inventory[3].set_east(1)
 
-blue_player.inventory[4].set_west(1)
-blue_player.inventory[4].set_south(1)
-blue_player.inventory[4].set_north(1)
-blue_player.inventory[4].set_east(1)
+blue_player.inventory[4].set_west(9)
+blue_player.inventory[4].set_south(9)
+blue_player.inventory[4].set_north(9)
+blue_player.inventory[4].set_east(9)
 
 
 # red card - these should be defeated by blue - minimise stats for debugging 
