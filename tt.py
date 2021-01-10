@@ -784,28 +784,39 @@ class CPU():
                             pprint.pprint(self.defensive_moves)
                              
 
-                # play the appropriate card and revert defensive_moves to {}                 
+                    # play the appropriate card and revert defensive_moves and possible_moves to {}                 
+                    print("making top pick from attacks")
 
+
+                    positions = list(self.defensive_moves.keys())
+
+                    top_pick= self.defensive_moves[positions[0]][1]
+                    selection = {positions[0]: self.defensive_moves[positions[0]]}
+
+                    print("top_pick",top_pick)
+                    print("selection",selection)
+
+                    for pos in positions:
+                        if self.defensive_moves[pos][1] > top_pick:
+                            top_pick = self.defensive_moves[pos][1]
+                            selection = {pos:self.defensive_moves[pos]}
                         
-
-                    # calc overall sums 
-
-
-
-                    # prioritise 1 pole to defend 
-
-
-
-
-
-
-                    # 3 cases - (with some varaiataion based on wheteher there are multiple positions)
-                    # case 1 - one pole to protect - wait select for one pole to protect first - so least amount to worry about 
-                    # pick the highest defense
-
-                    # case 2 - 2 poles - pick highest sum-disparity
-
-                    # case 3 3 poles - same as above - but sum is total of 3 and disparity is the gap between end members (highest and lowest pole) 
+                    position_list = list(selection.keys())
+                    position = position_list[0]
+                    print("position",position)
+                    
+                    card_index = selection[position][0]
+                    print("card_index",card_index)
+                    card = self.inventory[selection[position][0]]
+                    print("card",card)
+            #
+                    # play the card 
+                    print(self.board.ret_board_in_play())
+                    self.play_card(position,card,card_index)
+                    print(self.board.ret_board_in_play())
+            #
+                    # revert defensive_moves to {}
+                    self.defensive_moves = {}
  
 
             # In the event of no availabe attacks 
