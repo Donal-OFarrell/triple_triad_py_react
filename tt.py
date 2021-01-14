@@ -104,22 +104,36 @@ class Deck():
 
 
 
-
-# card opposite filter 
-# if a card is red, the opposite is blue etc 
-#opposite_colour = {'blue':'red',
-#                    'red':'blue'}
-
-
 # each card can occupy a position on the board R1: 0,1,2  R2: 3,4,5  R3: 7,8,9
 # board has become sort of a game class too - but the board's magic I guess :P 
 class Board():
     board_spaces = 9 
     spaces_filled = 0 # when this equals above game is over 
+
     def __init__(self):
         self.positions = {'pos_0':['empty',self.pos_0_combat],'pos_1':['empty',self.pos_1_combat],'pos_2':['empty',self.pos_2_combat],
         'pos_3':['empty',self.pos_3_combat],'pos_4':['empty',self.pos_4_combat],'pos_5':['empty',self.pos_5_combat],
         'pos_6':['empty',self.pos_6_combat],'pos_7':['empty',self.pos_7_combat],'pos_8':['empty',self.pos_8_combat]}
+        self.blue_score = 5
+        self.red_score = 5
+        
+
+    def adjust_scores(self,winning_colour):
+        print("---------------------reached adjust_scores")
+        print(winning_colour)
+        if winning_colour == 'blue':
+
+            self.blue_score = self.blue_score + 1
+            self.red_score = self.red_score - 1
+
+        elif winning_colour == 'red':
+
+            self.red_score = self.red_score + 1
+            self.blue_score = self.blue_score - 1
+
+
+
+
 
     def accept_card(self,position,card):
         ''' card places into position - not very 'oopy' consider revision'''
@@ -139,7 +153,7 @@ class Board():
         return self.spaces_filled
 
     def state_of_board(self):
-        ''' displays the baord in it's current state'''
+        ''' displays the board in it's current state'''
         #print(self.positions)
         positions=self.positions
 
@@ -181,7 +195,12 @@ class Board():
                 if self.positions['pos_0'][0].get_west() > self.positions['pos_1'][0].get_east(): # if the number is bigger -> then flip the card 
         #  TO DO: create a pointer to array containing two colours - apply the opposite of attacking card
                     print("0 fighting 1")
-                    self.positions['pos_1'][0].set_colour(self.positions['pos_0'][0].get_colour()) # flip the card to attacking cards colour 
+                    self.positions['pos_1'][0].set_colour(self.positions['pos_0'][0].get_colour()) # flip the card to attacking cards colour
+                    
+                    # carry out score changes 
+                    print("winning_colour", self.positions['pos_0'][0].get_colour())
+                    self.adjust_scores(self.positions['pos_0'][0].get_colour())
+
                     print("0 flipped 1") # debug checks 
         # TO DO: adjust score for red/blue player 
 
@@ -191,6 +210,12 @@ class Board():
                 if self.positions['pos_0'][0].get_south() > self.positions['pos_3'][0].get_north():
                     print("0 fighting 3")
                     self.positions['pos_3'][0].set_colour(self.positions['pos_0'][0].get_colour()) # again opposite of placed card 
+
+                    # carry out score changes 
+                    print("winning_colour", self.positions['pos_0'][0].get_colour())
+                    self.adjust_scores(self.positions['pos_0'][0].get_colour())
+
+
                     print("0 flipped 3") # to colour
 
     def pos_1_combat(self):
@@ -201,13 +226,22 @@ class Board():
                 if self.positions['pos_1'][0].get_west() > self.positions['pos_0'][0].get_east():
                     print("1 fighting 0")
                     self.positions['pos_0'][0].set_colour(self.positions['pos_1'][0].get_colour()) # flip the card to attacking cards colour 
+
+
                     print("1 flipped 0")
         # fight 2
         if self.positions['pos_2'][0] != 'empty':
             if self.positions['pos_2'][0].get_colour() != self.positions['pos_1'][0].get_colour():
                 if self.positions['pos_1'][0].get_east() > self.positions['pos_2'][0].get_west():
                     print("1 fighting 2")
-                    self.positions['pos_2'][0].set_colour(self.positions['pos_1'][0].get_colour()) # flip the card to attacking cards colour 
+                    self.positions['pos_2'][0].set_colour(self.positions['pos_1'][0].get_colour()) # flip the card to attacking cards colour
+
+                    # carry out score changes 
+                    print("winning_colour", self.positions['pos_1'][0].get_colour())
+                    self.adjust_scores(self.positions['pos_1'][0].get_colour())
+
+
+
                     print("1 flipped 2")
 
         # fight 4 
@@ -216,6 +250,12 @@ class Board():
                 if self.positions['pos_1'][0].get_south() > self.positions['pos_4'][0].get_north():
                     print("1 fighting 4")
                     self.positions['pos_4'][0].set_colour(self.positions['pos_1'][0].get_colour()) # flip the card to attacking cards colour 
+                    
+                    # carry out score changes 
+                    print("winning_colour", self.positions['pos_1'][0].get_colour())
+                    self.adjust_scores(self.positions['pos_1'][0].get_colour())
+
+                    
                     print("1 flipped 4")
 
     def pos_2_combat(self):
@@ -226,6 +266,12 @@ class Board():
                 if self.positions['pos_2'][0].get_west() > self.positions['pos_1'][0].get_east(): 
                     print("2 fighting 1")
                     self.positions['pos_1'][0].set_colour(self.positions['pos_2'][0].get_colour()) # flip the card to attacking cards colour
+                    
+                    # carry out score changes 
+                    print("winning_colour", self.positions['pos_2'][0].get_colour())
+                    self.adjust_scores(self.positions['pos_2'][0].get_colour())
+
+
                     print("2 flipped 1")
         # fight 5 
         if self.positions['pos_5'][0] != 'empty': 
@@ -233,6 +279,11 @@ class Board():
                 if self.positions['pos_2'][0].get_south() > self.positions['pos_5'][0].get_north():
                     print("2 fighting 5")
                     self.positions['pos_5'][0].set_colour(self.positions['pos_2'][0].get_colour()) # flip the card to attacking cards colour
+                    # carry out score changes 
+                    print("winning_colour", self.positions['pos_2'][0].get_colour())
+                    self.adjust_scores(self.positions['pos_2'][0].get_colour())                   
+
+
                     print("2 flipped 5")
 
     def pos_3_combat(self):
@@ -243,6 +294,11 @@ class Board():
                 if self.positions['pos_3'][0].get_north() > self.positions['pos_0'][0].get_south():
                     print("3 fighting 0")
                     self.positions['pos_0'][0].set_colour(self.positions['pos_3'][0].get_colour()) # flip the card to attacking cards colour
+                    # carry out score changes 
+                    print("winning_colour", self.positions['pos_3'][0].get_colour())
+                    self.adjust_scores(self.positions['pos_3'][0].get_colour())
+
+
                     print("3 flipped 0")
 
         #fight 4 
@@ -251,6 +307,11 @@ class Board():
                 if self.positions['pos_3'][0].get_east() > self.positions['pos_4'][0].get_west():
                     print("3 fighting 4")
                     self.positions['pos_4'][0].set_colour(self.positions['pos_3'][0].get_colour()) # flip the card to attacking cards colour
+                    # carry out score changes 
+                    print("winning_colour", self.positions['pos_3'][0].get_colour())
+                    self.adjust_scores(self.positions['pos_3'][0].get_colour())
+
+
                     print("3 flipped 4")
         
         # fight 6 
@@ -259,6 +320,12 @@ class Board():
                 if self.positions['pos_3'][0].get_south() > self.positions['pos_6'][0].get_north():
                     print("3 fighting 6")
                     self.positions['pos_6'][0].set_colour(self.positions['pos_3'][0].get_colour()) # flip the card to attacking cards colour
+
+                    # carry out score changes 
+                    print("winning_colour", self.positions['pos_3'][0].get_colour())
+                    self.adjust_scores(self.positions['pos_3'][0].get_colour())
+
+
                     print("3 flipped 6")
 
     def pos_4_combat(self):
@@ -269,6 +336,12 @@ class Board():
                 if self.positions['pos_4'][0].get_north() > self.positions['pos_1'][0].get_south():
                     print("4 fighting 1")
                     self.positions['pos_1'][0].set_colour(self.positions['pos_4'][0].get_colour()) # flip the card to attacking cards colour
+
+                    # carry out score changes 
+                    print("winning_colour", self.positions['pos_4'][0].get_colour())
+                    self.adjust_scores(self.positions['pos_4'][0].get_colour())
+
+
                     print("4 flipped 1")
         # fight 3 
         if self.positions['pos_3'][0] != 'empty':
@@ -276,6 +349,12 @@ class Board():
                 if self.positions['pos_4'][0].get_west() > self.positions['pos_3'][0].get_east():
                     print("4 fighting 3")
                     self.positions['pos_3'][0].set_colour(self.positions['pos_4'][0].get_colour()) # flip the card to attacking cards colour
+
+                    # carry out score changes 
+                    print("winning_colour", self.positions['pos_4'][0].get_colour())
+                    self.adjust_scores(self.positions['pos_4'][0].get_colour())                    
+
+
                     print("4 flipped 3")
 
         # fight 5 
@@ -284,6 +363,12 @@ class Board():
                 if self.positions['pos_4'][0].get_east() > self.positions['pos_5'][0].get_west():
                     print("4 fighting 5")
                     self.positions['pos_5'][0].set_colour(self.positions['pos_4'][0].get_colour()) # flip the card to attacking cards colour
+
+                    # carry out score changes 
+                    print("winning_colour", self.positions['pos_4'][0].get_colour())
+                    self.adjust_scores(self.positions['pos_4'][0].get_colour())
+
+
                     print("4 flipped 5")
 
         # fight 7 
@@ -292,6 +377,11 @@ class Board():
                 if self.positions['pos_4'][0].get_south() > self.positions['pos_7'][0].get_north():
                     print("4 fighting 7")
                     self.positions['pos_7'][0].set_colour(self.positions['pos_4'][0].get_colour()) # flip the card to attacking cards colour
+                    # carry out score changes 
+                    print("winning_colour", self.positions['pos_4'][0].get_colour())
+                    self.adjust_scores(self.positions['pos_4'][0].get_colour())
+
+
                     print("4 flipped 7") 
 
 
@@ -303,6 +393,13 @@ class Board():
                 if self.positions['pos_5'][0].get_north() > self.positions['pos_2'][0].get_south():
                     print("5 fighting 2")
                     self.positions['pos_2'][0].set_colour(self.positions['pos_5'][0].get_colour()) # flip the card to attacking cards colour
+
+                    # carry out score changes 
+                    print("winning_colour", self.positions['pos_5'][0].get_colour())
+                    self.adjust_scores(self.positions['pos_5'][0].get_colour())
+
+
+
                     print("5 flipped 2")
         
         # fight 4 
@@ -311,6 +408,12 @@ class Board():
                 if self.positions['pos_5'][0].get_west() > self.positions['pos_4'][0].get_east():
                     print("5 fighting 4")
                     self.positions['pos_4'][0].set_colour(self.positions['pos_5'][0].get_colour()) # flip the card to attacking cards colour
+
+                    # carry out score changes 
+                    print("winning_colour", self.positions['pos_5'][0].get_colour())
+                    self.adjust_scores(self.positions['pos_5'][0].get_colour())
+
+
                     print("5 flipped 4")
 
         # fight 8 
@@ -319,6 +422,12 @@ class Board():
                 if self.positions['pos_5'][0].get_south() > self.positions['pos_4'][0].get_north():
                     print("5 fighting 8")
                     self.positions['pos_8'][0].set_colour(self.positions['pos_5'][0].get_colour()) # flip the card to attacking cards colour
+
+                    # carry out score changes 
+                    print("winning_colour", self.positions['pos_5'][0].get_colour())
+                    self.adjust_scores(self.positions['pos_5'][0].get_colour())
+
+
                     print("5 flipped 8")
 
     def pos_6_combat(self):
@@ -329,6 +438,10 @@ class Board():
                 if self.positions['pos_6'][0].get_north() > self.positions['pos_3'][0].get_south():
                     print("6 fighting 3")
                     self.positions['pos_3'][0].set_colour(self.positions['pos_6'][0].get_colour()) # flip the card to attacking cards colour
+                    # carry out score changes 
+                    print("winning_colour", self.positions['pos_6'][0].get_colour())
+                    self.adjust_scores(self.positions['pos_6'][0].get_colour())
+ 
                     print("6 flipped 3")
 
         # fight 7 
@@ -337,6 +450,12 @@ class Board():
                 if self.positions['pos_6'][0].get_east() > self.positions['pos_7'][0].get_west():
                     print("6 fighting 7")
                     self.positions['pos_7'][0].set_colour(self.positions['pos_6'][0].get_colour()) # flip the card to attacking cards colour
+
+                    # carry out score changes 
+                    print("winning_colour", self.positions['pos_6'][0].get_colour())
+                    self.adjust_scores(self.positions['pos_6'][0].get_colour())
+
+
                     print("6 flipped 7")
 
     def pos_7_combat(self):
@@ -347,6 +466,12 @@ class Board():
                 if self.positions['pos_7'][0].get_west() > self.positions['pos_6'][0].get_east():
                     print("7 fighting 6")
                     self.positions['pos_6'][0].set_colour(self.positions['pos_7'][0].get_colour()) # flip the card to attacking cards colour
+
+                    # carry out score changes 
+                    print("winning_colour", self.positions['pos_7'][0].get_colour())
+                    self.adjust_scores(self.positions['pos_7'][0].get_colour())
+
+
                     print("7 flipped 6")
         # fight 4
         if self.positions['pos_4'][0] != 'empty':
@@ -354,6 +479,13 @@ class Board():
                 if self.positions['pos_7'][0].get_north() > self.positions['pos_4'][0].get_south():
                     print("7 fighting 4")
                     self.positions['pos_4'][0].set_colour(self.positions['pos_7'][0].get_colour()) # flip the card to attacking cards colour
+
+                    # carry out score changes 
+                    print("winning_colour", self.positions['pos_7'][0].get_colour())
+                    self.adjust_scores(self.positions['pos_7'][0].get_colour())
+
+
+
                     print("7 flipped 4")
 
         # fight 8 
@@ -362,6 +494,12 @@ class Board():
                 if self.positions['pos_7'][0].get_east() > self.positions['pos_8'][0].get_west():
                     print("7 fighting 8")
                     self.positions['pos_8'][0].set_colour(self.positions['pos_7'][0].get_colour()) # flip the card to attacking cards colour
+
+                    # carry out score changes 
+                    print("winning_colour", self.positions['pos_7'][0].get_colour())
+                    self.adjust_scores(self.positions['pos_7'][0].get_colour())                
+
+
                     print("7 flipped 8")
 
     def pos_8_combat(self):
@@ -372,6 +510,12 @@ class Board():
                 if self.positions['pos_8'][0].get_west() > self.positions['pos_7'][0].get_east():
                     print("8 fighting 7")
                     self.positions['pos_7'][0].set_colour(self.positions['pos_8'][0].get_colour()) # flip the card to attacking cards colour
+
+                    # carry out score changes 
+                    print("winning_colour", self.positions['pos_8'][0].get_colour())
+                    self.adjust_scores(self.positions['pos_8'][0].get_colour())
+
+                    
                     print("8 flipped 7")
         
         # fight 5 
@@ -380,6 +524,11 @@ class Board():
                 if self.positions['pos_8'][0].get_north() > self.positions['pos_5'][0].get_south():
                     print("8 fighting 5")
                     self.positions['pos_5'][0].set_colour(self.positions['pos_8'][0].get_colour()) # flip the card to attacking cards colour
+
+                    # carry out score changes 
+                    print("winning_colour", self.positions['pos_8'][0].get_colour())
+                    self.adjust_scores(self.positions['pos_8'][0].get_colour())
+
                     print("8 flipped 5")
 
 
@@ -470,7 +619,7 @@ class CPU():
             print("Board is empty therefore we play defensive in one of four corners")
             self.defensive_opener() 
 
-        else:
+        else: # initiate search for attacks
             attack_options = self.spaces_in_play.keys()
 
             print("looping through attack options")
@@ -498,7 +647,7 @@ class CPU():
                 if self.possible_moves[option] != {}:
                     valid_attacks[option] = self.possible_moves[option]
 
-            print("valid_attacks")
+            print("valid_attacks") # consider dropping this for an attribute maybe 
             pprint.pprint(valid_attacks)
 
             if valid_attacks != {}:
@@ -2102,13 +2251,27 @@ print("Inventory before")
 red_player.show_inventory()
 
 
-blue_player.play_card('pos_3',blue_player.inventory[4],4)
-#blue_player.play_card('pos_0',blue_player.inventory[3],3)
+blue_player.play_card('pos_3',blue_player.inventory[0],4)
+blue_player.play_card('pos_1',blue_player.inventory[3],3)
 
+print("**********blue",board.blue_score)
+print("red",board.red_score)
 
 red_player.make_move()
 
 print("Inventory after")
 red_player.show_inventory()
 
+print("blue",board.blue_score)
+print("red",board.red_score)
+
 print(board.ret_board_in_play())
+
+
+print("blue",board.blue_score)
+print("red",board.red_score)
+
+#board.adjust_scores('blue')
+
+print("blue",board.blue_score)
+print("red",board.red_score)
