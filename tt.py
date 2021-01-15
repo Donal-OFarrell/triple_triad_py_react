@@ -75,6 +75,10 @@ class Player():
     def get_player_colour(self):
         return self.colour
 
+    def show_inventory(self):
+        for card in self.inventory:
+            card.show_compass_values()
+
     def add_to_inventory(self,card):
         self.inventory.append(card)
 
@@ -572,7 +576,8 @@ class CPU():
         return self.inventory 
 
     def show_inventory(self):
-        print (self.inventory)
+        for card in self.inventory:
+            card.show_compass_values()
 
     def get_player_colour(self):
         return self.colour
@@ -2146,6 +2151,91 @@ class CPU():
           
 
 
+# create a loop to run test games 
+
+# instantiations
+deck = Deck() 
+board = Board()
+blue_player = Player(board)
+red_player = CPU(board)
+
+# deal to CPU and player 
+deck.deal_to_player(blue_player)
+deck.deal_to_player(red_player)
+
+#board.state_of_board()
+while board.spaces_filled < 9:
+    pprint.pprint(board.ret_board_in_play())
+
+
+    print("blue Player score",board.blue_score)
+    print("red CPU score",board.red_score)
+
+    print("red inv")
+    red_player.show_inventory()
+    print("blue_inv")
+    blue_player.show_inventory()
+
+    player_input = input("play card in format inv_card,pos")
+
+    # cards to be played here 
+    # extract message 
+    card_pos = player_input.split(',')
+    position = card_pos[0]
+    index = int(card_pos[1])
+    card = blue_player.inventory[index]
+
+
+    blue_player.play_card(position,card,index)
+
+    pprint.pprint(board.ret_board_in_play())
+
+    print("red inv")
+    red_player.show_inventory()
+    print("blue_inv")
+    blue_player.show_inventory()
+
+    # then red player plays 
+    red_player.make_move()
+
+if board.blue_score > board.red_score:
+    print("You win")
+else:
+    print("You lose human, CPU wins!")
+
+
+
+
+#blue_player.play_card('pos_3',blue_player.inventory[0],4)
+#blue_player.play_card('pos_1',blue_player.inventory[3],3)
+
+#print("**********blue",board.blue_score)
+#print("red",board.red_score)
+
+#red_player.make_move()
+
+#print("Inventory after")
+#red_player.show_inventory()
+
+#print("blue",board.blue_score)
+#print("red",board.red_score)
+
+#print(board.ret_board_in_play())
+
+
+#print("blue",board.blue_score)
+#print("red",board.red_score)
+
+#board.adjust_scores('blue')
+
+#print("blue",board.blue_score)
+#print("red",board.red_score)
+
+
+
+
+
+
 # what get's passed to the defensive methods is:
 #   if there are attacks we pass those to assess their defense relative to the attack
 #   if there are no attacks we pass all the possible spaces and pick the best move 
@@ -2153,17 +2243,17 @@ class CPU():
 # tests 
 
 # check if deck builds and we have alternating colours - yes 
-deck_test = Deck()
+#deck_test = Deck()
 
 # initalise board 
-board = Board()
+#board = Board()
 
 # define some players 
-blue_player = Player(board)
-red_player = CPU(board)
+#blue_player = Player(board)
+#red_player = CPU(board)
 
-deck_test.deal_to_player(blue_player)
-deck_test.deal_to_player(red_player)
+#deck_test.deal_to_player(blue_player)
+#deck_test.deal_to_player(red_player)
 
 #for card in blue_player.inventory:
 #    print(card.get_colour())
@@ -2180,38 +2270,23 @@ deck_test.deal_to_player(red_player)
 
 # checks - max out blue card stats - minimise red card stats and test all combat
 # max out the attacking poles stats 
-print("Blue card before")
-blue_player.inventory[0].show_compass_values()
-blue_player.inventory[0].set_west(1)
-blue_player.inventory[0].set_south(1)
-blue_player.inventory[0].set_north(1)
-blue_player.inventory[0].set_east(1)
-print("Blue card after")
-blue_player.inventory[0].show_compass_values()
-
-blue_player.inventory[1].set_west(1)
-blue_player.inventory[1].set_south(1)
-blue_player.inventory[1].set_north(1)
-blue_player.inventory[1].set_east(1)
-
-blue_player.inventory[2].set_west(1)
-blue_player.inventory[2].set_south(1)
-blue_player.inventory[2].set_north(1)
-blue_player.inventory[2].set_east(1)
-
-blue_player.inventory[3].set_west(1)
-blue_player.inventory[3].set_south(1)
-blue_player.inventory[3].set_north(1)
-blue_player.inventory[3].set_east(1)
-
-blue_player.inventory[4].set_west(9)
-blue_player.inventory[4].set_south(9)
-blue_player.inventory[4].set_north(9)
-blue_player.inventory[4].set_east(9)
+#print("Blue card before")
+#blue_player.inventory[0].show_compass_values()
+#blue_player.inventory[0].set_west(1)
+#blue_player.inventory[0].set_south(1)
+#blue_player.inventory[0].set_north(1)
+#blue_player.inventory[0].set_east(1)
+#print("Blue card after")
+#blue_player.inventory[0].show_compass_values()
+#
+#blue_player.inventory[1].set_west(1)
+#blue_player.inventory[1].set_south(1)
+#blue_player.inventory[1].set_north(1)
+#blue_player.inventory[4].set_east(9)
 
 
 # red card - these should be defeated by blue - minimise stats for debugging 
-print("red before")
+#print("red before")
 #red_player.inventory[1].show_compass_values()
 #red_player.inventory[1].set_east(9)
 #red_player.inventory[1].set_north(9)
@@ -2243,35 +2318,11 @@ print("red before")
 
 
 
-board.state_of_board()
+#board.state_of_board()
 
-print(board.ret_board_in_play())
+#print(board.ret_board_in_play())
 
-print("Inventory before")
-red_player.show_inventory()
-
-
-blue_player.play_card('pos_3',blue_player.inventory[0],4)
-blue_player.play_card('pos_1',blue_player.inventory[3],3)
-
-print("**********blue",board.blue_score)
-print("red",board.red_score)
-
-red_player.make_move()
-
-print("Inventory after")
-red_player.show_inventory()
-
-print("blue",board.blue_score)
-print("red",board.red_score)
-
-print(board.ret_board_in_play())
+#print("Inventory before")
 
 
-print("blue",board.blue_score)
-print("red",board.red_score)
 
-#board.adjust_scores('blue')
-
-print("blue",board.blue_score)
-print("red",board.red_score)
