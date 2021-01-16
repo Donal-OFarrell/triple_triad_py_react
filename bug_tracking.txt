@@ -1,0 +1,68 @@
+Test runs of the game via manual testing 
+Remember to enter the card configurations/inventory when the error occured 
+
+-----------------------
+This space is full, you can't place a card over another card 
+
+Description:
+CPU for some reason is attempting to play in spaces where the board is already occupied with a card 
+
+When does this occur: 
+
+
+
+------------------------
+------------------------
+no_def_card_index error 
+
+
+blue Player score 3
+red CPU score 7
+red inv
+{'north': 6, 'east': 2, 'south': 4, 'west': 5}
+blue_inv
+{'north': 8, 'east': 9, 'south': 1, 'west': 8}
+play card in format inv_card, pos:  pos_8,0
+{'pos_0': [<__main__.Card object at 0x109fdc450>,
+           {'east': 4, 'north': 8, 'south': 7, 'west': 6},
+           'blue'],
+ 'pos_1': [<__main__.Card object at 0x109fdc4d0>,
+           {'east': 7, 'north': 3, 'south': 2, 'west': 3},
+           'red'],
+ 'pos_2': [<__main__.Card object at 0x109fdc5d0>,
+           {'east': 5, 'north': 1, 'south': 2, 'west': 5},
+           'red'],
+ 'pos_3': [<__main__.Card object at 0x109fdc290>,
+           {'east': 8, 'north': 9, 'south': 9, 'west': 2},
+           'red'],
+ 'pos_4': [<__main__.Card object at 0x109fdc1d0>,
+           {'east': 7, 'north': 4, 'south': 7, 'west': 2},
+           'red'],
+ 'pos_5': [<__main__.Card object at 0x109fdc490>,
+           {'east': 6, 'north': 4, 'south': 8, 'west': 3},
+           'red'],
+ 'pos_6': [<__main__.Card object at 0x109fdc550>,
+           {'east': 9, 'north': 8, 'south': 1, 'west': 7},
+           'red'],
+ 'pos_7': [<__main__.Card object at 0x109b80a90>,
+           {'east': 8, 'north': 7, 'south': 7, 'west': 7},
+           'blue'],
+ 'pos_8': [<__main__.Card object at 0x109fdc090>,
+           {'east': 9, 'north': 8, 'south': 1, 'west': 8},
+           'blue']}
+red inv
+{'north': 6, 'east': 2, 'south': 4, 'west': 5}
+
+
+
+Available spaces from CPU class
+{'pos_0': ['empty', 'no_values'], 'pos_1': ['empty', 'no_values'], 'pos_2': ['empty', 'no_values'], 'pos_3': ['empty', 'no_values'], 'pos_4': ['empty', 'no_values'], 'pos_5': ['empty', 'no_values'], 'pos_7': ['empty', 'no_values'], 'pos_8': ['empty', 'no_values']}
+
+Traceback (most recent call last):
+  File "/Users/user1/Documents/triple_triad_py3/tt.py", line 2199, in <module>
+    red_player.make_move()
+  File "/Users/user1/Documents/triple_triad_py3/tt.py", line 769, in make_move
+    no_def_card = self.inventory[no_def_card_index]
+IndexError: list index out of range
+
+---------------------------------------

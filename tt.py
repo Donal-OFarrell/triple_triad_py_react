@@ -616,32 +616,32 @@ class CPU():
         # needs to read state of board 
         self.assess_board()
 
-        print("board empty check")
-        print(self.is_board_empty)
+        #print("board empty check")
+        #print(self.is_board_empty)
 
         if self.is_board_empty:
             # initial defensive move - one of the four corners
-            print("Board is empty therefore we play defensive in one of four corners")
+            #print("Board is empty therefore we play defensive in one of four corners")
             self.defensive_opener() 
 
         else: # initiate search for attacks
             attack_options = self.spaces_in_play.keys()
 
-            print("looping through attack options")
+            #print("looping through attack options")
             for option in attack_options: 
-                print()
-                print(option)
+            #    print()
+            #    print(option)
                 self.attack_map[option]()
-                print("printing board status")
-                print(self.board_status)
+            #    print("printing board status")
+            #    print(self.board_status)
 
 
             # then here assess the possible moves and pick the best - ie produces flip with wthe best subsequent defense
-            print("printing possible moves")
-            pprint.pprint(self.possible_moves)
+            #print("printing possible moves")
+            #pprint.pprint(self.possible_moves)
 
             print()
-            print("Here the top attacking options need to be selected")
+            #print("Here the top attacking options need to be selected")
 
             valid_attacks = {}
 
@@ -650,18 +650,18 @@ class CPU():
 
             for option in attack_options:
                 if self.possible_moves[option] != {}:
-                    valid_attacks[option] = self.possible_moves[option]
+                    valid_attacks[option] = self.possible_moves[option] 
 
-            print("valid_attacks") # consider dropping this for an attribute maybe 
-            pprint.pprint(valid_attacks)
+            #print("valid_attacks") # consider dropping this for an attribute maybe 
+            #pprint.pprint(valid_attacks)
 
             if valid_attacks != {}:
 
                 # now here we need to find out if there are doubles/triples
-                print("double triple checks")
+                #print("double triple checks")
                 valid_attack_positions = valid_attacks.keys()
 
-                print("valid_attack_positions",valid_attack_positions)
+                #print("valid_attack_positions",valid_attack_positions)
 
                 pos_dubs_trips={}
                 doubles_triples={}
@@ -671,12 +671,12 @@ class CPU():
 
                 for pos in valid_attack_positions:
                     attacks = valid_attacks[pos] # attacks for that position 
-                    print("attacks",attacks)
-                    print(type(attacks))
+                #    print("attacks",attacks)
+                #    print(type(attacks))
                     #for i in range(len(list(attacks.keys()))): # extract all of the inv cards - getting key error every now and then
                     inv_card_keys = list(attacks.keys())
                     for key in inv_card_keys: 
-                        print(key)
+                #        print(key)
                         attack_values = attacks[key]
                         if attack_values[1] > 2:
                             if double_bool:
@@ -690,39 +690,39 @@ class CPU():
                         pos_dubs_trips[pos] = doubles_triples
                     doubles_triples = {}
 
-                print("check before after")
-                pprint.pprint(valid_attacks)
-                print("changed to")
-                pprint.pprint(pos_dubs_trips) # this is the attacks that are greater than singles 
+            #    print("check before after")
+            #    pprint.pprint(valid_attacks)
+            #    print("changed to")
+            #    pprint.pprint(pos_dubs_trips) # this is the attacks that are greater than singles 
 
                 # if the above has been altered then there are doubles or triples and we should ignore the singles and update valid_attacks 
                 if pos_dubs_trips != {}:
                      valid_attacks = pos_dubs_trips
 
-                print("Check we have changed valid_attacks")
-                pprint.pprint(valid_attacks)
+            #    print("Check we have changed valid_attacks")
+            #    pprint.pprint(valid_attacks)
                             
 
-                print()
-                print("from here the defensive footprint of the attacking options need to be assessed")
+            #    print()
+            #    print("from here the defensive footprint of the attacking options need to be assessed")
                 # pass valid attacks keys 
 
                 valid_attack_keys = list(valid_attacks.keys())
 
-                print("check valid attack keys",valid_attack_keys)
+            #    print("check valid attack keys",valid_attack_keys)
 
 
-                print("defensive_moves before the change", self.defensive_moves)
+            #    print("defensive_moves before the change", self.defensive_moves)
 
                 for position in valid_attack_keys:
-                    print(position)
+            #        print(position)
                     self.defensive_map[position](self.inventory) # this should invoke the method - which should then popluate defensive_moves
 
-                print("defensive_moves check here")
-                pprint.pprint(self.defensive_moves) # in the case of the pos 1 triple - there is no defense - pick any card that gets the job done - basically a no defense case
+            #    print("defensive_moves check here")
+            #    pprint.pprint(self.defensive_moves) # in the case of the pos 1 triple - there is no defense - pick any card that gets the job done - basically a no defense case
                 
-                print()
-                print("now need to select the card with the best defense")
+            #    print()
+            #    print("now need to select the card with the best defense")
 
                 # if defense N/A - play lowest value card or any card that gets the job done - in that case use card with lowest power - revert get power
                 # I suspect there may be more examples of this - but you'd have a position with no defense required - pick this one - over one with defense required 
@@ -742,49 +742,49 @@ class CPU():
 
                 if pos_to_attack != '': # then extract the powers of the cards and choose the lowest - then play this one 
                     cards=valid_attacks[pos_to_attack]
-                    print("cards",cards)
+            #        print("cards",cards)
                     card_keys = list(cards.keys())
-                    print("card_keys",card_keys)
+            #        print("card_keys",card_keys)
                     lowest_power_card = valid_attacks[pos_to_attack][card_keys[0]] # select the first one 
-                    print("lowest_power_card",lowest_power_card)
+            #        print("lowest_power_card",lowest_power_card)
                     power_of_lowest = lowest_power_card[0]
-                    print("power_of_lowest",power_of_lowest)
+            #        print("power_of_lowest",power_of_lowest)
 
                     no_def_attack = {pos_to_attack:''} # placeholder for the positiona nd the ventual card to attack 
-                    print("checking cards after pos_to_attack")
+            #        print("checking cards after pos_to_attack")
                     for card in card_keys:
                         if valid_attacks[pos_to_attack][card][0] < power_of_lowest:
                             lowest_power_card = valid_attacks[pos_to_attack][card]
 
                         no_def_attack = {pos_to_attack:[card,lowest_power_card]}
 
-                    print("checking no_def_attack")
-                    print(no_def_attack)
+            #        print("checking no_def_attack")
+            #        print(no_def_attack)
 
                     no_def_pos = list(no_def_attack.keys())
                     no_def_pos = no_def_pos[0]
-                    print("no_def_pos",no_def_pos)
+            #        print("no_def_pos",no_def_pos)
                     no_def_card_index = no_def_attack[no_def_pos][1][1]
-                    print("no_def_card_index",no_def_card_index)
+            #        print("no_def_card_index",no_def_card_index)
                     no_def_card = self.inventory[no_def_card_index]
-                    print("no_def_card",no_def_card)
+            #        print("no_def_card",no_def_card)
 
                     # add the actual attack command 
-                    pprint.pprint(self.board.ret_board_in_play())
+            #        pprint.pprint(self.board.ret_board_in_play())
                     self.play_card(no_def_pos,no_def_card,no_def_card_index)
-                    pprint.pprint(self.board.ret_board_in_play())
+            #        pprint.pprint(self.board.ret_board_in_play())
 
                    
                 # else pick the card with the best d - that means another bit of logic here 
                 #### STOPPED HERE
                 else: # there are no defense free attacks 
-                    print("arrived at attacks with defensive considerations")
-                    pprint.pprint(valid_attacks)
+            #        print("arrived at attacks with defensive considerations")
+            #        pprint.pprint(valid_attacks)
                     
                     # do the defensive stuff 
                     # have we already popluated defensive moves above? 
-                    print("defensive moves in a situation where defense is important during an attack")
-                    pprint.pprint(self.defensive_moves)
+            #        print("defensive moves in a situation where defense is important during an attack")
+            #        pprint.pprint(self.defensive_moves)
 
                     # need to loop through the defensive stuff 
                     # sum the poles together 
@@ -801,14 +801,14 @@ class CPU():
                     for pos in POI: 
                         # can have up to three positions to sum
                         section = self.defensive_moves[pos] # each position 
-                        print(pos,"section",section) 
-                        print(type(section))
+            #            print(pos,"section",section) 
+            #            print(type(section))
 
                         # if section.length() > 1
                         if len(section) > 1:
                             # get the keys for one
                             inv_cards = list(section[0].keys())
-                            print("inv_cards",inv_cards)
+            #                print("inv_cards",inv_cards)
                             
                             # define base dictionary 
                             dict_1 = section[0]
@@ -833,8 +833,8 @@ class CPU():
                                 for index in inv_cards:
                                     dict_1[index].append(dict_3.get(index, {})) # add all of the dictionaries together one after the other 
                                 
-                                print("checking dict 1 in a 3 pole situation")
-                                pprint.pprint(dict_1)
+            #                    print("checking dict 1 in a 3 pole situation")
+            #                    pprint.pprint(dict_1)
 
                                 # initially need to find the highest and lowest end member poles for calculations
                                 # for index in inv_cards:
@@ -845,7 +845,7 @@ class CPU():
                                     # calc sum - disparity  
                                 for index in inv_cards:
                                     pole_values = [dict_1[index][1], dict_1[index][2][1], dict_1[index][3][1]]
-                                    print("pole_values", pole_values) 
+            #                        print("pole_values", pole_values) 
                                     max_pole = max(pole_values)
                                     min_pole = min(pole_values)
                                     disparity = max_pole - min_pole
@@ -857,8 +857,8 @@ class CPU():
                             
                             concatenated_positions[pos] = dict_1
 
-                    print("concatenated_positions")
-                    pprint.pprint(concatenated_positions) 
+            #        print("concatenated_positions")
+            #        pprint.pprint(concatenated_positions) 
 
                     # if there have been concatenations for one or more positions 
                     # replace this key in self.defensive_moves 
@@ -866,9 +866,9 @@ class CPU():
                     for pos in concatenated_positions.keys():
                         self.defensive_moves[pos]  = concatenated_positions[pos] 
 
-                    print("self.defensive_moves after the change")
+            #        print("self.defensive_moves after the change")
 
-                    pprint.pprint(self.defensive_moves)
+            #        pprint.pprint(self.defensive_moves)
 
                     # if type(self.defensive_moves) 
                     #  is_list = then you take the max of the poles 
@@ -877,56 +877,56 @@ class CPU():
                     
                     is_list = type([])
                     is_dict = type({})
-                    print("is_list",is_list)
-                    print("is_dict",is_dict)
+            #        print("is_list",is_list)
+            #        print("is_dict",is_dict)
 
                     for pos in self.defensive_moves.keys():
                         # loop through the intended positions to attack
                         intended_attacks = self.defensive_moves[pos] # aka section from above - will need to refactor all this significantly - lots of redundant code in this method
                         if type(intended_attacks) == is_list:
                             # get max 
-                            print("intended_attacks single array case",intended_attacks)
+            #                print("intended_attacks single array case",intended_attacks)
                             inv_cards = list(intended_attacks[0].keys())
-                            print("inv_cards",inv_cards)
+            #                print("inv_cards",inv_cards)
                             #max_val = {inv_cards[0]:intended_attacks[inv_cards[0]]} # need to get this right
                             
                             #print("inv_cards[0]",inv_cards[0])
                             #print("*-*intended_attacks[0][inv_cards[0]][1]*-*",intended_attacks[0][inv_cards[0]][1])
                             max_val = [inv_cards[0],intended_attacks[0][inv_cards[0]][1]]
-                            print("max_val", max_val)
+            #                print("max_val", max_val)
                             
                             for index in inv_cards:
                                 if intended_attacks[0][index][1] > max_val[1]:
                                     max_val = [index,intended_attacks[0][index][1]]
-                                    print("max val after change in array")
-                                    print(max_val)
+            #                        print("max val after change in array")
+            #                        print(max_val)
                                 # now loop through and find the maximum 
 
                             
                             self.defensive_moves[pos] = max_val
-                            print("defensive moves after changes")
-                            pprint.pprint(self.defensive_moves)
+            #                print("defensive moves after changes")
+            #                pprint.pprint(self.defensive_moves)
 
                         
                         elif type(intended_attacks) == is_dict:
                             # get max and divide by appropriate value 
-                            print("intended_attacks dict case",intended_attacks)
+            #                print("intended_attacks dict case",intended_attacks)
                             inv_cards = list(intended_attacks.keys())
-                            print("inv cards dict",inv_cards)
+            #                print("inv cards dict",inv_cards)
                             division_factor = intended_attacks[inv_cards[0]][1] # define division factor (how many poles to divide by)
-                            print("division factor", division_factor)
+            #                print("division factor", division_factor)
 
                             max_val = [inv_cards[0],intended_attacks[inv_cards[0]][0]]
-                            print("max val dict case")
+            #                print("max val dict case")
 
                             # loop through and get max
                             first_highest = True
                             for index in inv_cards:
                                 if intended_attacks[index][0] > intended_attacks[inv_cards[0]][0]:
                                     first_highest = False
-                                    print("checking dict max val value",intended_attacks[index][0])
-                                    print("checking division factor",division_factor)
-                                    print("checking calculation",intended_attacks[index][0]/division_factor)
+            #                        print("checking dict max val value",intended_attacks[index][0])
+            #                        print("checking division factor",division_factor)
+            #                        print("checking calculation",intended_attacks[index][0]/division_factor)
                                     max_val = [index, intended_attacks[index][0]/division_factor] # divide by divsion factor
                             
                             if first_highest:
@@ -934,12 +934,12 @@ class CPU():
                                    
 
                             self.defensive_moves[pos] = max_val
-                            print("defensive moves after changes in dict case")
-                            pprint.pprint(self.defensive_moves)
+            #                print("defensive moves after changes in dict case")
+            #                pprint.pprint(self.defensive_moves)
                              
 
                     # play the appropriate card and revert defensive_moves and possible_moves to {}                 
-                    print("making top pick from attacks")
+            #        print("making top pick from attacks")
 
 
                     positions = list(self.defensive_moves.keys())
@@ -947,8 +947,8 @@ class CPU():
                     top_pick= self.defensive_moves[positions[0]][1]
                     selection = {positions[0]: self.defensive_moves[positions[0]]}
 
-                    print("top_pick",top_pick)
-                    print("selection",selection)
+            #        print("top_pick",top_pick)
+            #        print("selection",selection)
 
                     for pos in positions:
                         if self.defensive_moves[pos][1] > top_pick:
@@ -957,17 +957,17 @@ class CPU():
                         
                     position_list = list(selection.keys())
                     position = position_list[0]
-                    print("position",position)
+            #        print("position",position)
                     
                     card_index = selection[position][0]
-                    print("card_index",card_index)
+            #        print("card_index",card_index)
                     card = self.inventory[selection[position][0]]
-                    print("card",card)
+            #        print("card",card)
             #
                     # play the card 
-                    print(self.board.ret_board_in_play())
+            #        print(self.board.ret_board_in_play())
                     self.play_card(position,card,card_index)
-                    print(self.board.ret_board_in_play())
+            #        print(self.board.ret_board_in_play())
             #
                     # revert defensive_moves to {}
                     self.defensive_moves = {}
@@ -977,14 +977,14 @@ class CPU():
             else: #
                 print()
                 print()
-                print("manually checking defensive methods")
+            #    print("manually checking defensive methods")
 
                 for option in attack_options:
-                    print(option)
+            #        print(option)
                     self.defensive_map[option](self.inventory)
 
-                print("printing defensive sitrep")
-                pprint.pprint(self.defensive_moves)
+            #    print("printing defensive sitrep")
+            #    pprint.pprint(self.defensive_moves)
 
                 POI = list(self.defensive_moves.keys()) # positions of interest for attack/defense
 
@@ -995,14 +995,14 @@ class CPU():
                 for pos in POI: 
                     # can have up to three positions to sum
                     section = self.defensive_moves[pos] # each position 
-                    print(pos,"section",section) 
-                    print(type(section))
+            #        print(pos,"section",section) 
+            #        print(type(section))
 
                     # if section.length() > 1
                     if len(section) > 1:
                         # get the keys for one
                         inv_cards = list(section[0].keys())
-                        print("inv_cards",inv_cards)
+            #            print("inv_cards",inv_cards)
                         
                         # define base dictionary 
                         dict_1 = section[0]
@@ -1014,7 +1014,7 @@ class CPU():
 
                             for index in inv_cards:
                                 sum_dispar = [dict_1[index][1] + dict_1[index][2][1], abs(dict_1[index][1] - dict_1[index][2][1])] # calculate sum and disparity
-                                print("sum_dispar",sum_dispar)
+            #                    print("sum_dispar",sum_dispar)
                                 dict_1[index] = [sum_dispar[0] - sum_dispar[1],2] # sum - disparity is ther ultimate winner - highest sum and lowest disparity is the best card - alos add division factor
 
                         if len(section) == 3:
@@ -1027,8 +1027,8 @@ class CPU():
                             for index in inv_cards:
                                 dict_1[index].append(dict_3.get(index, {})) # add all of the dictionaries together one after the other 
                             
-                            print("checking dict 1 in a 3 pole situation")
-                            pprint.pprint(dict_1)
+            #                print("checking dict 1 in a 3 pole situation")
+            #                pprint.pprint(dict_1)
 
                             # initially need to find the highest and lowest end member poles for calculations
                             # for index in inv_cards:
@@ -1039,7 +1039,7 @@ class CPU():
                                 # calc sum - disparity  
                             for index in inv_cards:
                                 pole_values = [dict_1[index][1], dict_1[index][2][1], dict_1[index][3][1]]
-                                print("pole_values", pole_values) 
+            #                    print("pole_values", pole_values) 
                                 max_pole = max(pole_values)
                                 min_pole = min(pole_values)
                                 disparity = max_pole - min_pole
@@ -1051,29 +1051,29 @@ class CPU():
                         
                         concatenated_positions[pos] = dict_1
 
-                print("concatenated_positions for defesnive only")
-                pprint.pprint(concatenated_positions)
+            #    print("concatenated_positions for defesnive only")
+            #    pprint.pprint(concatenated_positions)
 
                 for pos in concatenated_positions.keys():
                     self.defensive_moves[pos]  = concatenated_positions[pos] 
 
-                print("self.defensive_moves after the change")
+            #    print("self.defensive_moves after the change")
 
-                pprint.pprint(self.defensive_moves)
+            #    pprint.pprint(self.defensive_moves)
 
                 is_list = type([])
                 is_dict = type({})
-                print("is_list",is_list)
-                print("is_dict",is_dict)
+            #    print("is_list",is_list)
+            #    print("is_dict",is_dict)
 
                 for pos in self.defensive_moves.keys():
                     # loop through the intended positions to attack
                     intended_attacks = self.defensive_moves[pos] # aka section from above - will need to refactor all this significantly - lots of redundant code in this method
                     if type(intended_attacks) == is_list:
                         # get max 
-                        print("intended_attacks single array case",intended_attacks)
+            #            print("intended_attacks single array case",intended_attacks)
                         inv_cards = list(intended_attacks[0].keys())
-                        print("inv_cards",inv_cards)
+            #            print("inv_cards",inv_cards)
                         #max_val = {inv_cards[0]:intended_attacks[inv_cards[0]]} # need to get this right
                         
                         #print("inv_cards[0]",inv_cards[0])
@@ -1084,35 +1084,35 @@ class CPU():
                         for index in inv_cards:
                             if intended_attacks[0][index][1] > max_val[1]:
                                 max_val = [index,intended_attacks[0][index][1]]
-                                print("max val after change in array")
-                                print(max_val)
+            #                    print("max val after change in array")
+            #                    print(max_val)
                             # now loop through and find the maximum 
 
                         
                         self.defensive_moves[pos] = max_val
-                        print("defensive moves after changes")
-                        pprint.pprint(self.defensive_moves)
+            #            print("defensive moves after changes")
+            #            pprint.pprint(self.defensive_moves)
 
                     
                     elif type(intended_attacks) == is_dict:
                         # get max and divide by appropriate value 
-                        print("intended_attacks dict case",intended_attacks)
+            #            print("intended_attacks dict case",intended_attacks)
                         inv_cards = list(intended_attacks.keys())
-                        print("inv cards dict",inv_cards)
+            #            print("inv cards dict",inv_cards)
                         division_factor = intended_attacks[inv_cards[0]][1] # define division factor (how many poles to divide by)
-                        print("division factor", division_factor)
+            #            print("division factor", division_factor)
 
                         max_val = [inv_cards[0],intended_attacks[inv_cards[0]][0]]
-                        print("max val dict case")
+            #            print("max val dict case")
 
                         # loop through and get max
                         first_highest = True
                         for index in inv_cards:
                             if intended_attacks[index][0] > intended_attacks[inv_cards[0]][0]:
                                 first_highest = False
-                                print("checking dict max val value",intended_attacks[index][0])
-                                print("checking division factor",division_factor)
-                                print("checking calculation",intended_attacks[index][0]/division_factor)
+            #                    print("checking dict max val value",intended_attacks[index][0])
+            #                    print("checking division factor",division_factor)
+            #                    print("checking calculation",intended_attacks[index][0]/division_factor)
                                 max_val = [index, intended_attacks[index][0]/division_factor] # divide by divsion factor
                         
                         if first_highest:
@@ -1120,12 +1120,12 @@ class CPU():
                                
 
                         self.defensive_moves[pos] = max_val
-                        print("defensive moves after changes in dict case")
-                        pprint.pprint(self.defensive_moves)
+        #                print("defensive moves after changes in dict case")
+        #                pprint.pprint(self.defensive_moves)
                          
 
                 # play the appropriate card and revert defensive_moves and possible_moves to {}                 
-                print("***making top pick for defense***")
+        #        print("***making top pick for defense***")
 
 
                 positions = list(self.defensive_moves.keys())
@@ -1133,8 +1133,8 @@ class CPU():
                 top_pick= self.defensive_moves[positions[0]][1]
                 selection = {positions[0]: self.defensive_moves[positions[0]]}
 
-                print("top_pick",top_pick)
-                print("selection",selection)
+        #        print("top_pick",top_pick)
+        #        print("selection",selection)
 
                 for pos in positions:
                     if self.defensive_moves[pos][1] > top_pick:
@@ -1143,17 +1143,17 @@ class CPU():
                     
                 position_list = list(selection.keys())
                 position = position_list[0]
-                print("position",position)
+        #        print("position",position)
                 
                 card_index = selection[position][0]
-                print("card_index",card_index)
+        #        print("card_index",card_index)
                 card = self.inventory[selection[position][0]]
-                print("card",card)
+        #        print("card",card)
         #
                 # play the card 
-                print(self.board.ret_board_in_play())
+        #        print(self.board.ret_board_in_play())
                 self.play_card(position,card,card_index)
-                print(self.board.ret_board_in_play())
+        #        print(self.board.ret_board_in_play())
         #
                 # revert defensive_moves to {}
                 self.defensive_moves = {}
@@ -1166,9 +1166,9 @@ class CPU():
         corners= ['pos_0','pos_2','pos_6','pos_8']
         
         for option in corners:
-            print(option)
+        #    print(option)
             self.defensive_map[option](self.inventory) # add all the options 
-        pprint.pprint(self.defensive_moves)
+        #pprint.pprint(self.defensive_moves)
         
         # first of all break down how to use/digest this info 
         
@@ -1180,24 +1180,24 @@ class CPU():
             pos_0_dict_1 = pos_0[0] 
             pos_0_dict_2 = pos_0[1]
 
-            print("pos_0_dict_1",pos_0_dict_1)
-            print("pos_0_dict_2",pos_0_dict_2)
+        #    print("pos_0_dict_1",pos_0_dict_1)
+        #    print("pos_0_dict_2",pos_0_dict_2)
 
             for k in pos_0_dict_1.keys():
-                print(k)
+        #        print(k)
                 pos_0_dict_1[k].append(pos_0_dict_2.get(k, {})) # add the dictionaries together for each inv card/position 
 
-            pprint.pprint(pos_0_dict_1)  
+        #    pprint.pprint(pos_0_dict_1)  
 
             for k in pos_0_dict_1:
                 sum_dispar = [pos_0_dict_1[k][1] + pos_0_dict_1[k][2][1], abs(pos_0_dict_1[k][1] - pos_0_dict_1[k][2][1])] # calculate sum and disparity
-                print("sum_dispar",sum_dispar)
+        #        print("sum_dispar",sum_dispar)
                 pos_0_dict_1[k] = sum_dispar[0] - sum_dispar[1] # sum - disparity is ther ultimate winner - highest sum and lowest disparity is the best card 
 
             sum_disparity[option] = pos_0_dict_1
 
-        print("***check sum disaprity")
-        print(sum_disparity)
+        #print("***check sum disaprity")
+        #print(sum_disparity)
 
         # select the card with the largest overall int score 
         # then play that card 
@@ -1205,21 +1205,21 @@ class CPU():
         high_sums = {}
 
         for option in corners:
-            print("sum_disparity[option]",sum_disparity[option])
-            print(max(sum_disparity[option], key=sum_disparity[option].get))
+        #    print("sum_disparity[option]",sum_disparity[option])
+        #    print(max(sum_disparity[option], key=sum_disparity[option].get))
             #high_sums[option] = [max(sum_disparity[option], key=sum_disparity[option].get)]
             high_sums[option] = [max(sum_disparity[option], key=sum_disparity[option].get) ,sum_disparity[option][max(sum_disparity[option], key=sum_disparity[option].get)]]
 
-        print("***high_sums***")
-        print(high_sums)
+        #print("***high_sums***")
+        #print(high_sums)
 
 
         
         top_pick = high_sums['pos_0'] # initiate top pick 
         selection = {'pos_0':top_pick} # initiate selection 
 
-        print("***top_pick***")
-        print(top_pick)
+        #print("***top_pick***")
+        #print(top_pick)
         
 
         for pos,card_sum in high_sums.items():
@@ -1227,23 +1227,23 @@ class CPU():
                 top_pick = card_sum
                 selection = {pos:top_pick}
 #
-        print("after selection")
-        print(selection)
+        #print("after selection")
+        #print(selection)
 
 
         position_list = list(selection.keys())
         position = position_list[0]
-        print("position",position)
+        #print("position",position)
         
         card_index = selection[position][0]
-        print("card_index",card_index)
+        #print("card_index",card_index)
         card = self.inventory[selection[position][0]]
-        print("card",card)
+        #print("card",card)
 #
         # play the card 
-        print(self.board.ret_board_in_play())
+        #print(self.board.ret_board_in_play())
         self.play_card(position,card,card_index)
-        print(self.board.ret_board_in_play())
+        #print(self.board.ret_board_in_play())
 #
         # revert defensive_moves to {}
         self.defensive_moves = {}
@@ -1260,33 +1260,33 @@ class CPU():
             inv_card_power = inv_card.card_power() # assses cards power/score 
             inv_card_index = self.inventory.index(inv_card)# assign an index to card being assessed 
             # pos 1 check with double case 
-            print("first check")
+    #        print("first check")
             if self.board_status['pos_1'][0] != 'empty':
                 if self.board_status['pos_1'][0].get_colour() != inv_card.get_colour():
-                    print("colour check passed")
+    #                print("colour check passed")
                     if inv_card.get_east() > self.board_status['pos_1'][0].get_west():
-                        print("0 versus 1 is a flip with ",inv_card_index)
+    #                    print("0 versus 1 is a flip with ",inv_card_index)
                         # here we assign the value to possible_moves 
                         pos_0_checks[inv_card_index] = [inv_card_power,1] # how to increment score? 
                         # another if statement here for the double case? 
                         if self.board_status['pos_3'][0] != 'empty':
-                            print("nested boolean")
+    #                        print("nested boolean")
                             three_check = True
                             if self.board_status['pos_3'][0].get_colour() != inv_card.get_colour(): 
                                 if inv_card.get_south() > self.board_status['pos_3'][0].get_north():
-                                    print("Double case for pos 0 with ", inv_card_index)
+    #                                print("Double case for pos 0 with ", inv_card_index)
                                     pos_0_checks[inv_card_index] = [inv_card_power,2]
                                     
             # then a solitary check here for pos 3 check
             if self.board_status['pos_3'][0] != 'empty' and three_check == False: # if the double check has taken place don't run this
                 if self.board_status['pos_3'][0].get_colour() != inv_card.get_colour(): 
                     if inv_card.get_south() > self.board_status['pos_3'][0].get_north():
-                        print("0 versus 3 is a flip with ", inv_card_index)
+    #                    print("0 versus 3 is a flip with ", inv_card_index)
                         pos_0_checks[inv_card_index] = [inv_card_power,1] 
 
         self.possible_moves['pos_0'] = pos_0_checks
-        print("checking possible moves")
-        print(self.possible_moves)
+    #    print("checking possible moves")
+    #    print(self.possible_moves)
 
     def pos_1_attack(self):
         '''AI actions for pos_1 
@@ -1302,34 +1302,34 @@ class CPU():
             if self.board_status['pos_0'][0] != 'empty': # card present 
                 if self.board_status['pos_0'][0].get_colour() != inv_card.get_colour(): # colour is opposite - fight! 
                     if inv_card.get_west() > self.board_status['pos_0'][0].get_east():
-                        print("1 versus 0 is a flip with ",inv_card_index)
+        #                print("1 versus 0 is a flip with ",inv_card_index)
                         # here we assign the value to possible_moves 
                         pos_1_checks[inv_card_index] = [inv_card_power,1]
                         # another if statement here for the double case for pos 4 
 
                         # pos 4 - double check
-                        print("first 4 check on double")
-                        print()
+        #                print("first 4 check on double")
+        #                print()
                         if self.board_status['pos_4'][0] != 'empty': # card present
                             four_check = True
-                            print("initial 4 check not empty passed")
-                            print(self.board_status['pos_4'][0].get_colour())
-                            print(inv_card.get_colour())
+        #                    print("initial 4 check not empty passed")
+        #                    print(self.board_status['pos_4'][0].get_colour())
+        #                    print(inv_card.get_colour())
                             if self.board_status['pos_4'][0].get_colour() != inv_card.get_colour(): 
-                                print("colour checks passed")
+        #                        print("colour checks passed")
                                 if inv_card.get_south() > self.board_status['pos_4'][0].get_north():
                                     # here we assign the value to possible_moves 
-                                    print("1 versus 4 is a double flip with ",inv_card_index)
+        #                            print("1 versus 4 is a double flip with ",inv_card_index)
                                     pos_1_checks[inv_card_index] = [inv_card_power,2]
                                     
                                     # another if statement here for the triple case?
-                                    print("triple case")
+        #                            print("triple case")
                                     if self.board_status['pos_2'][0] != 'empty' and two_check == False: # card present
                                         two_check = True
                                         if self.board_status['pos_2'][0].get_colour() != inv_card.get_colour():
                                             if inv_card.get_east() > self.board_status['pos_2'][0].get_east():
                                                 # here we assign the value to possible_moves 
-                                                print("1 versus 2 is a triple flip with ",inv_card_index)
+        #                                        print("1 versus 2 is a triple flip with ",inv_card_index)
                                                 pos_1_checks[inv_card_index] = [inv_card_power,3]
 
                         # pos 2 alternate double check
@@ -1338,7 +1338,7 @@ class CPU():
                             if self.board_status['pos_2'][0].get_colour() != inv_card.get_colour():
                                 if inv_card.get_east() > self.board_status['pos_2'][0].get_east():
                                     # here we assign the value to possible_moves 
-                                    print("solo 1 versus 2 is a double flip with ",inv_card_index)
+        #                            print("solo 1 versus 2 is a double flip with ",inv_card_index)
                                     pos_1_checks[inv_card_index] = [inv_card_power,2]
 
             # pos 4 check
@@ -1347,7 +1347,7 @@ class CPU():
                 if self.board_status['pos_4'][0].get_colour() != inv_card.get_colour(): 
                     if inv_card.get_south() > self.board_status['pos_4'][0].get_north():
                         # here we assign the value to possible_moves 
-                        print("1 versus 4 is a double flip with ",inv_card_index)
+        #                print("1 versus 4 is a double flip with ",inv_card_index)
                         pos_1_checks[inv_card_index] = [inv_card_power,1]
 
                         if self.board_status['pos_2'][0] != 'empty' and two_check==False: # card present
@@ -1355,7 +1355,7 @@ class CPU():
                             if self.board_status['pos_2'][0].get_colour() != inv_card.get_colour():
                                 if inv_card.get_east() > self.board_status['pos_2'][0].get_east():
                                     # here we assign the value to possible_moves 
-                                    print("1 versus 2 is a double flip with ",inv_card_index)
+        #                            print("1 versus 2 is a double flip with ",inv_card_index)
                                     pos_1_checks[inv_card_index] = [inv_card_power,2]
 
             # pos 2 check 
@@ -1363,12 +1363,12 @@ class CPU():
                 if self.board_status['pos_2'][0].get_colour() != inv_card.get_colour():
                     if inv_card.get_east() > self.board_status['pos_2'][0].get_east():
                         # here we assign the value to possible_moves 
-                        print("1 versus 2 is a double flip with ",inv_card_index)
+    #                    print("1 versus 2 is a double flip with ",inv_card_index)
                         pos_1_checks[inv_card_index] = [inv_card_power,1]
         
         self.possible_moves['pos_1'] = pos_1_checks
-        print("checking possible moves")
-        print(self.possible_moves)
+    #    print("checking possible moves")
+    #    print(self.possible_moves)
 
     def pos_2_attack(self):
         ''' position 2 attack assessment method
@@ -1384,7 +1384,7 @@ class CPU():
                 if self.board_status['pos_1'][0].get_colour() != inv_card.get_colour(): 
                     if inv_card.get_west() > self.board_status['pos_1'][0].get_east():
                         # here we assign the value to possible_moves 
-                        print("2 versus 1 is a flip with ",inv_card_index)
+        #                print("2 versus 1 is a flip with ",inv_card_index)
                         pos_2_checks[inv_card_index] = [inv_card_power,1]
 
                         # double check for pos 5 
@@ -1392,7 +1392,7 @@ class CPU():
                             five_check = True # don't check again 
                             if self.board_status['pos_5'][0].get_colour() != inv_card.get_colour():
                                 if inv_card.get_south() > self.board_status['pos_5'][0].get_north():
-                                    print("2 versus 5 is a double flip with ",inv_card_index)
+        #                            print("2 versus 5 is a double flip with ",inv_card_index)
                                     pos_2_checks[inv_card_index] = [inv_card_power,2]
 
             # pos 5 check 
@@ -1400,7 +1400,7 @@ class CPU():
                     if self.board_status['pos_5'][0] != 'empty': # card present 
                         if self.board_status['pos_5'][0].get_colour() != inv_card.get_colour():
                             if inv_card.get_south() > self.board_status['pos_5'][0].get_north():
-                                print("2 versus 5 is a double flip with ",inv_card_index)
+    #                            print("2 versus 5 is a double flip with ",inv_card_index)
                                 pos_2_checks[inv_card_index] = [inv_card_power,1]
 
         self.possible_moves['pos_2'] = pos_2_checks # add the checks to the possible_moves attribute 
@@ -1418,31 +1418,31 @@ class CPU():
             if self.board_status['pos_0'][0] != 'empty': # card present 
                 if self.board_status['pos_0'][0].get_colour() != inv_card.get_colour(): # colour is opposite - fight! 
                     if inv_card.get_north() > self.board_status['pos_0'][0].get_south():
-                        print("3 versus 0 is a flip with ",inv_card_index)
+        #                print("3 versus 0 is a flip with ",inv_card_index)
                         # here we assign the value to possible_moves 
                         pos_3_checks[inv_card_index] = [inv_card_power,1]
                         # another if statement here for the double case for pos 4 
 
                         # pos 4 - double check
-                        print("first 4 check on double")
-                        print()
+        #                print("first 4 check on double")
+        #                print()
                         if self.board_status['pos_4'][0] != 'empty': # card present
                             four_check = True
-                            print("initial 4 check not empty passed")
+        #                    print("initial 4 check not empty passed")
                             if self.board_status['pos_4'][0].get_colour() != inv_card.get_colour(): 
                                 if inv_card.get_east() > self.board_status['pos_4'][0].get_west():
                                     # here we assign the value to possible_moves 
-                                    print("3 versus 4 is a double flip with ",inv_card_index)
+        #                            print("3 versus 4 is a double flip with ",inv_card_index)
                                     pos_3_checks[inv_card_index] = [inv_card_power,2]
                                     
                                     # another if statement here for the triple case?
-                                    print("triple case")
+        #                            print("triple case")
                                     if self.board_status['pos_6'][0] != 'empty' and six_check == False: # card present
                                         two_check = True
                                         if self.board_status['pos_6'][0].get_colour() != inv_card.get_colour():
                                             if inv_card.get_south() > self.board_status['pos_6'][0].get_north():
                                                 # here we assign the value to possible_moves 
-                                                print("1 versus 2 is a triple flip with ",inv_card_index)
+        #                                        print("1 versus 2 is a triple flip with ",inv_card_index)
                                                 pos_3_checks[inv_card_index] = [inv_card_power,3]
 
 
@@ -1451,7 +1451,7 @@ class CPU():
                 if self.board_status['pos_4'][0].get_colour() != inv_card.get_colour(): 
                     if inv_card.get_east() > self.board_status['pos_4'][0].get_west():
                         # here we assign the value to possible_moves 
-                        print("3 versus 4 is a flip with ",inv_card_index)
+        #                print("3 versus 4 is a flip with ",inv_card_index)
                         pos_3_checks[inv_card_index] = [inv_card_power,1]
 
                         if self.board_status['pos_6'][0] != 'empty' and six_check==False: # card present
@@ -1459,7 +1459,7 @@ class CPU():
                             if self.board_status['pos_6'][0].get_colour() != inv_card.get_colour():
                                 if inv_card.get_south() > self.board_status['pos_6'][0].get_north():
                                     # here we assign the value to possible_moves 
-                                    print("3 versus 6 is a double flip with ",inv_card_index)
+        #                            print("3 versus 6 is a double flip with ",inv_card_index)
                                     pos_1_checks[inv_card_index] = [inv_card_power,2]
 
             # pos 6 check 
@@ -1467,12 +1467,12 @@ class CPU():
                 if self.board_status['pos_6'][0].get_colour() != inv_card.get_colour():
                     if inv_card.get_south() > self.board_status['pos_6'][0].get_north():
                         # here we assign the value to possible_moves 
-                        print("3 versus 6 is a flip with ",inv_card_index)
+    #                    print("3 versus 6 is a flip with ",inv_card_index)
                         pos_3_checks[inv_card_index] = [inv_card_power,1]
 
         self.possible_moves['pos_3'] = pos_3_checks
-        print("checking possible moves")
-        print(self.possible_moves)
+    #    print("checking possible moves")
+    #    print(self.possible_moves)
 
             
     def pos_4_attack(self):
@@ -1492,7 +1492,7 @@ class CPU():
             if self.board_status['pos_1'][0] != 'empty': # card present
                 if self.board_status['pos_1'][0].get_colour() != inv_card.get_colour():
                     if inv_card.get_north() > self.board_status['pos_1'][0].get_south():
-                        print("4 versus 1 is a flip with ",inv_card_index)
+        #                print("4 versus 1 is a flip with ",inv_card_index)
                         pos_4_checks[inv_card_index] = [inv_card_power,1]
 
                         # check for nested double case pos 3 
@@ -1500,7 +1500,7 @@ class CPU():
                             three_check = True
                             if self.board_status['pos_3'][0].get_colour() != inv_card.get_colour():
                                 if inv_card.get_west() > self.board_status['pos_3'][0].get_east():
-                                    print("4 versus 3 is a double flip with ",inv_card_index)
+        #                            print("4 versus 3 is a double flip with ",inv_card_index)
                                     pos_4_checks[inv_card_index] = [inv_card_power,2]
 
                                     # check for triple nested for pos 5 
@@ -1508,7 +1508,7 @@ class CPU():
                                         five_check = True
                                         if self.board_status['pos_5'][0].get_colour() != inv_card.get_colour():
                                             if inv_card.get_west() > self.board_status['pos_5'][0].get_east():
-                                                print("4 versus 5 is a triple flip with ",inv_card_index)
+        #                                        print("4 versus 5 is a triple flip with ",inv_card_index)
                                                 pos_4_checks[inv_card_index] = [inv_card_power,3]
 
                                                 # check for quadruple nested for pos 7
@@ -1516,7 +1516,7 @@ class CPU():
                                                     seven_check = True
                                                     if self.board_status['pos_7'][0].get_colour() != inv_card.get_colour():
                                                         if inv_card.get_south() > self.board_status['pos_7'][0].get_north():
-                                                            print("4 versus 7 is a quadruple flip with ",inv_card_index)
+        #                                                    print("4 versus 7 is a quadruple flip with ",inv_card_index)
                                                             pos_4_checks[inv_card_index] = [inv_card_power,4]
 
             # pos 3 check
@@ -1524,7 +1524,7 @@ class CPU():
                 three_check = True
                 if self.board_status['pos_3'][0].get_colour() != inv_card.get_colour():
                     if inv_card.get_west() > self.board_status['pos_3'][0].get_east():
-                        print("4 versus 3 is a single flip with ",inv_card_index)
+    #                    print("4 versus 3 is a single flip with ",inv_card_index)
                         pos_4_checks[inv_card_index] = [inv_card_power,1]
 
                         # check for nested double for pos 5 
@@ -1532,7 +1532,7 @@ class CPU():
                             five_check = True
                             if self.board_status['pos_5'][0].get_colour() != inv_card.get_colour():
                                 if inv_card.get_east() > self.board_status['pos_5'][0].get_west():
-                                    print("4 versus 5 is a double flip with ",inv_card_index)
+    #                                print("4 versus 5 is a double flip with ",inv_card_index)
                                     pos_4_checks[inv_card_index] = [inv_card_power,2]
 
                                     # check for nested triple with position 7 
@@ -1540,7 +1540,7 @@ class CPU():
                                         seven_check = True
                                         if self.board_status['pos_7'][0].get_colour() != inv_card.get_colour():
                                             if inv_card.get_south() > self.board_status['pos_7'][0].get_north():
-                                                print("4 versus 7 is a triple flip with ",inv_card_index)
+    #                                            print("4 versus 7 is a triple flip with ",inv_card_index)
                                                 pos_4_checks[inv_card_index] = [inv_card_power,3] 
 
 
@@ -1549,7 +1549,7 @@ class CPU():
                 five_check = True
                 if self.board_status['pos_5'][0].get_colour() != inv_card.get_colour():
                     if inv_card.get_east() > self.board_status['pos_5'][0].get_west():
-                        print("4 versus 5 is a single flip with ",inv_card_index)
+    #                    print("4 versus 5 is a single flip with ",inv_card_index)
                         pos_4_checks[inv_card_index] = [inv_card_power,1]
 
                         # nested check for double for pos 7 
@@ -1558,19 +1558,19 @@ class CPU():
                             seven_check = True
                             if self.board_status['pos_7'][0].get_colour() != inv_card.get_colour():
                                 if inv_card.get_south() > self.board_status['pos_7'][0].get_north():
-                                    print("4 versus 7 is a double flip with ",inv_card_index)
+    #                                print("4 versus 7 is a double flip with ",inv_card_index)
                                     pos_4_checks[inv_card_index] = [inv_card_power,2] 
 
             # pos 7 check
             if self.board_status['pos_7'][0] != 'empty' and seven_check == False: # card present 
                 if self.board_status['pos_7'][0].get_colour() != inv_card.get_colour():
                     if inv_card.get_south() > self.board_status['pos_7'][0].get_north():
-                        print("4 versus 7 is a single flip with ",inv_card_index)
+    #                    print("4 versus 7 is a single flip with ",inv_card_index)
                         pos_4_checks[inv_card_index] = [inv_card_power,1]
 
         self.possible_moves['pos_4'] = pos_4_checks
-        print("checking possible moves")
-        print(self.possible_moves)
+    #    print("checking possible moves")
+    #    print(self.possible_moves)
 
     def pos_5_attack(self):
         ''' 5 attackes 2,4 and 8'''
@@ -1586,7 +1586,7 @@ class CPU():
             if self.board_status['pos_2'][0] != 'empty': # card present
                 if self.board_status['pos_2'][0].get_colour() != inv_card.get_colour():
                     if inv_card.get_north() > self.board_status['pos_2'][0].get_south():
-                        print("5 versus 2 is a single flip with ",inv_card_index)
+        #                print("5 versus 2 is a single flip with ",inv_card_index)
                         pos_5_checks[inv_card_index] = [inv_card_power,1]
 
                         # nested double case for 4
@@ -1594,7 +1594,7 @@ class CPU():
                             four_check = True 
                             if self.board_status['pos_4'][0].get_colour() != inv_card.get_colour():
                                 if inv_card.get_west() > self.board_status['pos_4'][0].get_east():
-                                    print("5 versus 4 is a double flip with ",inv_card_index)
+        #                            print("5 versus 4 is a double flip with ",inv_card_index)
                                     pos_5_checks[inv_card_index] = [inv_card_power,2]
 
                                     # nested triple case for 8
@@ -1602,7 +1602,7 @@ class CPU():
                                         eight_check = True
                                         if self.board_status['pos_8'][0].get_colour() != inv_card.get_colour():
                                             if inv_card.get_south() > self.board_status['pos_8'][0].get_north():
-                                                print("5 versus 8 is a triple flip with ",inv_card_index)
+        #                                        print("5 versus 8 is a triple flip with ",inv_card_index)
                                                 pos_5_checks[inv_card_index] = [inv_card_power,3]
 
             # pos 4 check
@@ -1610,7 +1610,7 @@ class CPU():
                 four_check = True 
                 if self.board_status['pos_4'][0].get_colour() != inv_card.get_colour():
                     if inv_card.get_west() > self.board_status['pos_4'][0].get_east():
-                        print("5 versus 4 is a single flip with ",inv_card_index)
+        #                print("5 versus 4 is a single flip with ",inv_card_index)
                         pos_5_checks[inv_card_index] = [inv_card_power,1]
 
                         # double check for pos 8
@@ -1629,8 +1629,8 @@ class CPU():
                         pos_5_checks[inv_card_index] = [inv_card_power,1]
 
         self.possible_moves['pos_5'] = pos_5_checks
-        print("checking possible moves")
-        print(self.possible_moves)
+        #print("checking possible moves")
+        #print(self.possible_moves)
 
 
     def pos_6_attack(self):
@@ -1645,7 +1645,7 @@ class CPU():
             if self.board_status['pos_3'][0] != 'empty':
                 if self.board_status['pos_3'][0].get_colour() != inv_card.get_colour():
                     if inv_card.get_north() > self.board_status['pos_3'][0].get_south():
-                        print("6 versus 3 is a single flip with ",inv_card_index)
+        #                print("6 versus 3 is a single flip with ",inv_card_index)
                         pos_6_checks[inv_card_index] = [inv_card_power,1]
 
                         # check for nested double case for pos 7
@@ -1653,21 +1653,21 @@ class CPU():
                             seven_check = True
                             if self.board_status['pos_7'][0].get_colour() != inv_card.get_colour():
                                 if inv_card.get_east() > self.board_status['pos_7'][0].get_west():
-                                    print("6 versus 7 is a double flip with ",inv_card_index)
+        #                            print("6 versus 7 is a double flip with ",inv_card_index)
                                     pos_6_checks[inv_card_index] = [inv_card_power,2]
 
             # pos 7 check
             if self.board_status['pos_7'][0] != 'empty' and seven_check == False:
-                print("checks")
-                print(self.board_status['pos_7'][0],inv_card.get_colour()) 
+        #        print("checks")
+        #        print(self.board_status['pos_7'][0],inv_card.get_colour()) 
                 if self.board_status['pos_7'][0].get_colour() != inv_card.get_colour():
                     if inv_card.get_east() > self.board_status['pos_7'][0].get_west():
                         print("6 versus 7 is a single flip with ",inv_card_index)
                         pos_6_checks[inv_card_index] = [inv_card_power,1]
         
         self.possible_moves['pos_6'] = pos_6_checks
-        print("checking possible moves")
-        print(self.possible_moves)
+        #print("checking possible moves")
+        #print(self.possible_moves)
 
     def pos_7_attack(self):
         ''' 7 attacks 6, 4 and 8 '''
@@ -1682,7 +1682,7 @@ class CPU():
             if self.board_status['pos_6'][0] != 'empty':
                 if self.board_status['pos_6'][0].get_colour() != inv_card.get_colour():
                     if inv_card.get_west() > self.board_status['pos_6'][0].get_east():
-                        print("7 versus 6 is a single flip with ",inv_card_index)
+        #                print("7 versus 6 is a single flip with ",inv_card_index)
                         pos_7_checks[inv_card_index] = [inv_card_power,1]
 
                         # nested case for double at pos 4 
@@ -1690,7 +1690,7 @@ class CPU():
                             four_check= True
                             if self.board_status['pos_4'][0].get_colour() != inv_card.get_colour():
                                 if inv_card.get_north() > self.board_status['pos_4'][0].get_south():
-                                    print("7 versus 4 is a double flip with ",inv_card_index)
+        #                            print("7 versus 4 is a double flip with ",inv_card_index)
                                     pos_7_checks[inv_card_index] = [inv_card_power,2]
 
                                     # nested triple case at pos 8 
@@ -1698,7 +1698,7 @@ class CPU():
                                         eight_check = True
                                         if self.board_status['pos_8'][0].get_colour() != inv_card.get_colour():
                                             if inv_card.get_east() > self.board_status['pos_8'][0].get_west():
-                                                print("7 versus 8 is a triple flip with ",inv_card_index)
+        #                                        print("7 versus 8 is a triple flip with ",inv_card_index)
                                                 pos_7_checks[inv_card_index] = [inv_card_power,3]
 
             # pos 4 check 
@@ -1706,7 +1706,7 @@ class CPU():
                 four_check= True
                 if self.board_status['pos_4'][0].get_colour() != inv_card.get_colour():
                     if inv_card.get_north() > self.board_status['pos_4'][0].get_south():
-                        print("7 versus 4 is a single flip with ",inv_card_index)
+        #                print("7 versus 4 is a single flip with ",inv_card_index)
                         pos_7_checks[inv_card_index] = [inv_card_power,1]
 
                         # nested double case for pos 8
@@ -1714,22 +1714,22 @@ class CPU():
                             eight_check = True
                             if self.board_status['pos_8'][0].get_colour() != inv_card.get_colour():
                                 if inv_card.get_east() > self.board_status['pos_8'][0].get_west():
-                                    print("7 versus 8 is a double flip with ",inv_card_index)
+        #                            print("7 versus 8 is a double flip with ",inv_card_index)
                                     pos_7_checks[inv_card_index] = [inv_card_power,2] 
 
             # pos 8 check 
             if self.board_status['pos_8'][0] != 'empty' and eight_check == False:  
-                print("pos 7 attack, pos 8 check")
-                print(self.board_status['pos_8'][0].get_colour())
+        #        print("pos 7 attack, pos 8 check")
+        #        print(self.board_status['pos_8'][0].get_colour())
 
                 if self.board_status['pos_8'][0].get_colour() != inv_card.get_colour():
                     if inv_card.get_east() > self.board_status['pos_8'][0].get_west():
-                        print("7 versus 8 is a double flip with ",inv_card_index)
+        #                print("7 versus 8 is a double flip with ",inv_card_index)
                         pos_7_checks[inv_card_index] = [inv_card_power,2] 
 
         self.possible_moves['pos_7'] = pos_7_checks
-        print("checking possible moves")
-        print(self.possible_moves)
+        #print("checking possible moves")
+        #print(self.possible_moves)
 
     def pos_8_attack(self):
         ''' 8 attacks 5 and 7'''
@@ -1744,7 +1744,7 @@ class CPU():
             if self.board_status['pos_5'][0] != 'empty': 
                 if self.board_status['pos_5'][0].get_colour() != inv_card.get_colour():
                     if inv_card.get_north() > self.board_status['pos_5'][0].get_south():
-                        print("8 versus 5 is a single flip with ",inv_card_index)
+        #                print("8 versus 5 is a single flip with ",inv_card_index)
                         pos_8_checks[inv_card_index] = [inv_card_power,1]
 
                         # nested double case for pos 7
@@ -1752,7 +1752,7 @@ class CPU():
                             seven_check = True
                             if self.board_status['pos_7'][0].get_colour() != inv_card.get_colour():
                                 if inv_card.get_west() > self.board_status['pos_7'][0].get_east():
-                                    print("8 versus 7 is a double flip with ",inv_card_index)
+        #                            print("8 versus 7 is a double flip with ",inv_card_index)
                                     pos_8_checks[inv_card_index] = [inv_card_power,2]
 
             # pos 7 check 
@@ -1763,8 +1763,8 @@ class CPU():
                         print("8 versus 7 is a single flip with ",inv_card_index)
                         pos_8_checks[inv_card_index] = [inv_card_power,1]
         self.possible_moves['pos_8'] = pos_8_checks
-        print("checking possible moves")
-        print(self.possible_moves)
+        #print("checking possible moves")
+        #print(self.possible_moves)
 
     def pos_0_defense(self,cards):
         ''' makes a defensive assessment for position 0,
@@ -2176,7 +2176,7 @@ while board.spaces_filled < 9:
     print("blue_inv")
     blue_player.show_inventory()
 
-    player_input = input("play card in format inv_card,pos")
+    player_input = input("play card in format inv_card, pos:  ")
 
     # cards to be played here 
     # extract message 
