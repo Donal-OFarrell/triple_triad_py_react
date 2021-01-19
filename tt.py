@@ -423,7 +423,7 @@ class Board():
         # fight 8 
         if self.positions['pos_8'][0] != 'empty':
             if self.positions['pos_8'][0].get_colour() != self.positions['pos_5'][0].get_colour():
-                if self.positions['pos_5'][0].get_south() > self.positions['pos_4'][0].get_north():
+                if self.positions['pos_5'][0].get_south() > self.positions['pos_8'][0].get_north():
                     print("5 fighting 8")
                     self.positions['pos_8'][0].set_colour(self.positions['pos_5'][0].get_colour()) # flip the card to attacking cards colour
 
@@ -593,144 +593,99 @@ class CPU():
 
 
     def assess_board(self):
-        self.board_status = board.ret_board_in_play()
-        print()
+        self.board_status = self.board.ret_board_in_play() ## investigate this when less tired
+        print("board_status - check if this is broken")
+        print(self.board_status) 
 
+        
         empty = self.board.get_spaces_filled()
+        print("checking empty == self.board.get_spaces_filled() - that looks weird to me already")
+        print(empty)
 
         if empty == 0: # need to address this 
             self.is_board_empty = True
+
+        self.spaces_in_play = {}
              
         for key,value in self.board_status.items():
-            if value[1] == 'no_values':
+            if value[0] == 'empty':
                 self.spaces_in_play[key] = value
             else:
                 self.occupied_spaces[key] = value
+                #self.spaces_in_play[key] = value
 
-        print("Available spaces from CPU class")
-        print(self.spaces_in_play)
+        print("spaces in play after assess board")
+        print(self.spaces_in_play) # this is broken !!!!!!!!!!!!!!
+
 
 
     def make_move(self):
         ''' this is the CPU brain '''
-        # needs to read state of board 
+        
+        print("CPU assessinng board")
         self.assess_board()
 
-        #print("board empty check")
-        #print(self.is_board_empty)
 
         if self.is_board_empty:
-            # initial defensive move - one of the four corners
-            #print("Board is empty therefore we play defensive in one of four corners")
-            self.defensive_opener() 
+            self.defensive_opener()  # defensive opener invoked in the case of an empty board (i.e opening move)
 
         else: # initiate search for attacks
+            print("board not empty, searching for attacks")
             attack_options = self.spaces_in_play.keys()
+            print(attack_options)
 
-            #print("looping through attack options")
             for option in attack_options: 
-            #    print()
-            #    print(option)
-                self.attack_map[option]()
-            #    print("printing board status")
-            #    print(self.board_status)
-
-
-            # then here assess the possible moves and pick the best - ie produces flip with wthe best subsequent defense
-            #print("printing possible moves")
-            #pprint.pprint(self.possible_moves)
+                self.attack_map[option]() # invoke the attack moves to populate possible moves attribute 
 
             print()
-            #print("Here the top attacking options need to be selected")
 
             valid_attacks = {}
 
-
-           
-
             for option in attack_options:
-                if self.possible_moves[option] != {}:
+                if self.possible_moves[option] != {}: # remove any non attacking positions - could just reapply to attribute 
                     valid_attacks[option] = self.possible_moves[option] 
 
-            #print("valid_attacks") # consider dropping this for an attribute maybe 
-            #pprint.pprint(valid_attacks)
 
-            if valid_attacks != {}:
+            if valid_attacks != {}: # provided there are attacks available 
 
-                # now here we need to find out if there are doubles/triples
-                #print("double triple checks")
+                print("double triple checks") # search for doubles/triples
                 valid_attack_positions = valid_attacks.keys()
-
-                #print("valid_attack_positions",valid_attack_positions)
 
                 pos_dubs_trips={}
                 doubles_triples={}
                 triple_quad_bool = False
                 double_bool = False
 
-
                 for pos in valid_attack_positions:
                     attacks = valid_attacks[pos] # attacks for that position 
-                #    print("attacks",attacks)
-                #    print(type(attacks))
-                    #for i in range(len(list(attacks.keys()))): # extract all of the inv cards - getting key error every now and then
+
                     inv_card_keys = list(attacks.keys())
                     for key in inv_card_keys: 
-                #        print(key)
                         attack_values = attacks[key]
                         if attack_values[1] > 2:
                             if double_bool:
                                 doubles_triples = {} # if there has been doubles already then erase them
                             doubles_triples[key] = attack_values 
                             triple_quad_bool = True # if we have triples or quads - ignore doubles 
-                        if attack_values[1] > 1 and triple_quad_bool == False: # otherwise we have doubles so add them in - but this could occur later??? 
+                        if attack_values[1] > 1 and triple_quad_bool == False: # otherwise we have doubles so add them in 
                              doubles_triples[key] = attack_values
                              double_bool = True    
                     if doubles_triples != {}:
                         pos_dubs_trips[pos] = doubles_triples
                     doubles_triples = {}
 
-            #    print("check before after")
-            #    pprint.pprint(valid_attacks)
-            #    print("changed to")
-            #    pprint.pprint(pos_dubs_trips) # this is the attacks that are greater than singles 
 
                 # if the above has been altered then there are doubles or triples and we should ignore the singles and update valid_attacks 
                 if pos_dubs_trips != {}:
                      valid_attacks = pos_dubs_trips
 
-            #    print("Check we have changed valid_attacks")
-            #    pprint.pprint(valid_attacks)
-                            
-
-            #    print()
-            #    print("from here the defensive footprint of the attacking options need to be assessed")
-                # pass valid attacks keys 
-
+                print("from valid attacks we have - assess defensive footprint of each")
                 valid_attack_keys = list(valid_attacks.keys())
 
-            #    print("check valid attack keys",valid_attack_keys)
-
-
-            #    print("defensive_moves before the change", self.defensive_moves)
-
                 for position in valid_attack_keys:
-            #        print(position)
                     self.defensive_map[position](self.inventory) # this should invoke the method - which should then popluate defensive_moves
 
-            #    print("defensive_moves check here")
-            #    pprint.pprint(self.defensive_moves) # in the case of the pos 1 triple - there is no defense - pick any card that gets the job done - basically a no defense case
-                
-            #    print()
-            #    print("now need to select the card with the best defense")
-
-                # if defense N/A - play lowest value card or any card that gets the job done - in that case use card with lowest power - revert get power
-                # I suspect there may be more examples of this - but you'd have a position with no defense required - pick this one - over one with defense required 
-
-                # if no info - then we jknow that defense doesnt need to be considered  
-                # prioritise this choice
-                # play card with lowest power (not mathematical power - but as in game power) (sum from card_power method)
-
+                print("checking for attack with no defensive considerations thereafter - prioritise these")
                 pos_to_attack = '' # the position to attack in the case of no defense to consider 
 
                 for position in valid_attack_keys:
@@ -738,61 +693,46 @@ class CPU():
                         pos_to_attack = position # then thats' the position we attack
                         break # exit the loop on satisfying above 
                 
-                
-
                 if pos_to_attack != '': # then extract the powers of the cards and choose the lowest - then play this one 
                     cards=valid_attacks[pos_to_attack]
-            #        print("cards",cards)
-                    card_keys = list(cards.keys())
-            #        print("card_keys",card_keys)
-                    lowest_power_card = valid_attacks[pos_to_attack][card_keys[0]] # select the first one 
-            #        print("lowest_power_card",lowest_power_card)
-                    power_of_lowest = lowest_power_card[0]
-            #        print("power_of_lowest",power_of_lowest)
 
-                    no_def_attack = {pos_to_attack:''} # placeholder for the positiona nd the ventual card to attack 
-            #        print("checking cards after pos_to_attack")
+                    card_keys = list(cards.keys())
+
+                    lowest_power_card = valid_attacks[pos_to_attack][card_keys[0]] # select the first one 
+
+                    power_of_lowest = lowest_power_card[0]
+
+                    no_def_attack = {pos_to_attack:''} # placeholder for the position of the ventual card to attack 
+
                     for card in card_keys:
                         if valid_attacks[pos_to_attack][card][0] < power_of_lowest:
                             lowest_power_card = valid_attacks[pos_to_attack][card]
 
                         no_def_attack = {pos_to_attack:[card,lowest_power_card]}
 
-            #        print("checking no_def_attack")
-            #        print(no_def_attack)
 
                     no_def_pos = list(no_def_attack.keys())
                     no_def_pos = no_def_pos[0]
-            #        print("no_def_pos",no_def_pos)
-                    no_def_card_index = no_def_attack[no_def_pos][1][1]
-            #        print("no_def_card_index",no_def_card_index)
-                    no_def_card = self.inventory[no_def_card_index]
-            #        print("no_def_card",no_def_card)
 
-                    # add the actual attack command 
-            #        pprint.pprint(self.board.ret_board_in_play())
-                    self.play_card(no_def_pos,no_def_card,no_def_card_index)
-            #        pprint.pprint(self.board.ret_board_in_play())
+                    no_def_card_index = no_def_attack[no_def_pos][1][1]
+
+                    no_def_card = self.inventory[no_def_card_index]
+
+                    self.play_card(no_def_pos,no_def_card,no_def_card_index) # play no defense card if available 
+
 
                    
-                # else pick the card with the best d - that means another bit of logic here 
-                #### STOPPED HERE
+                # else pick the card with the best defesne 
                 else: # there are no defense free attacks 
-            #        print("arrived at attacks with defensive considerations")
-            #        pprint.pprint(valid_attacks)
-                    
-                    # do the defensive stuff 
-                    # have we already popluated defensive moves above? 
-            #        print("defensive moves in a situation where defense is important during an attack")
-            #        pprint.pprint(self.defensive_moves)
+                    print("arrived at attacks with defensive considerations")
 
-                    # need to loop through the defensive stuff 
-                    # sum the poles together 
-                    # then calculate the disparity => pole - pole
-                    # and finally sum - disparity 
-
-                    # need the keys from defensive moves first 
                     POI = list(self.defensive_moves.keys()) # positions of interest for attack/defense 
+                    # I think this should be valid attacks 
+                    print("valid_attacks", valid_attacks)
+                    print("POI", POI)
+
+                    # poi then needs the cards that can produce flips 
+                    # self.defensive_map[pos](inv_cards that can produce a flip)
 
                     sections = []
 
@@ -801,15 +741,11 @@ class CPU():
                     for pos in POI: 
                         # can have up to three positions to sum
                         section = self.defensive_moves[pos] # each position 
-            #            print(pos,"section",section) 
-            #            print(type(section))
 
-                        # if section.length() > 1
                         if len(section) > 1:
                             # get the keys for one
                             inv_cards = list(section[0].keys())
-            #                print("inv_cards",inv_cards)
-                            
+            
                             # define base dictionary 
                             dict_1 = section[0]
 
@@ -820,10 +756,9 @@ class CPU():
 
                                 for index in inv_cards:
                                     sum_dispar = [dict_1[index][1] + dict_1[index][2][1], abs(dict_1[index][1] - dict_1[index][2][1])] # calculate sum and disparity
-                                    print("sum_dispar",sum_dispar)
-                                    dict_1[index] = [sum_dispar[0] - sum_dispar[1],2] # sum - disparity is ther ultimate winner - highest sum and lowest disparity is the best card - alos add division factor
+                                    dict_1[index] = [sum_dispar[0] - sum_dispar[1],2] # sum - disparity is ther ultimate measure - highest sum and lowest disparity is the best card 
 
-                            if len(section) == 3:
+                            if len(section) == 3: 
                                 dict_2 = section[1] # define the second dictionary
                                 dict_3 = section[2] # define the third dictionary
 
@@ -832,9 +767,6 @@ class CPU():
 
                                 for index in inv_cards:
                                     dict_1[index].append(dict_3.get(index, {})) # add all of the dictionaries together one after the other 
-                                
-            #                    print("checking dict 1 in a 3 pole situation")
-            #                    pprint.pprint(dict_1)
 
                                 # initially need to find the highest and lowest end member poles for calculations
                                 # for index in inv_cards:
@@ -845,7 +777,6 @@ class CPU():
                                     # calc sum - disparity  
                                 for index in inv_cards:
                                     pole_values = [dict_1[index][1], dict_1[index][2][1], dict_1[index][3][1]]
-            #                        print("pole_values", pole_values) 
                                     max_pole = max(pole_values)
                                     min_pole = min(pole_values)
                                     disparity = max_pole - min_pole
@@ -857,76 +788,48 @@ class CPU():
                             
                             concatenated_positions[pos] = dict_1
 
-            #        print("concatenated_positions")
-            #        pprint.pprint(concatenated_positions) 
-
-                    # if there have been concatenations for one or more positions 
-                    # replace this key in self.defensive_moves 
 
                     for pos in concatenated_positions.keys():
                         self.defensive_moves[pos]  = concatenated_positions[pos] 
 
-            #        print("self.defensive_moves after the change")
-
-            #        pprint.pprint(self.defensive_moves)
 
                     # if type(self.defensive_moves) 
                     #  is_list = then you take the max of the poles 
                     #  is_dict - then again take the max of the dictionary 
-                    # maybe you could divide by the number of poles /2 | /3 - if that is above the top single value - play that 
+                    # for multi pole defensive cards - divide by the number of poles /2 | /3 - if that is above the top single value - play that 
                     
                     is_list = type([])
                     is_dict = type({})
-            #        print("is_list",is_list)
-            #        print("is_dict",is_dict)
 
                     for pos in self.defensive_moves.keys():
                         # loop through the intended positions to attack
-                        intended_attacks = self.defensive_moves[pos] # aka section from above - will need to refactor all this significantly - lots of redundant code in this method
+                        intended_attacks = self.defensive_moves[pos] # - consider refactor 
                         if type(intended_attacks) == is_list:
                             # get max 
-            #                print("intended_attacks single array case",intended_attacks)
+
                             inv_cards = list(intended_attacks[0].keys())
-            #                print("inv_cards",inv_cards)
-                            #max_val = {inv_cards[0]:intended_attacks[inv_cards[0]]} # need to get this right
+
+                            max_val = [inv_cards[0],intended_attacks[0][inv_cards[0]][1]] # intitiate max_val variable 
                             
-                            #print("inv_cards[0]",inv_cards[0])
-                            #print("*-*intended_attacks[0][inv_cards[0]][1]*-*",intended_attacks[0][inv_cards[0]][1])
-                            max_val = [inv_cards[0],intended_attacks[0][inv_cards[0]][1]]
-            #                print("max_val", max_val)
-                            
-                            for index in inv_cards:
+                            for index in inv_cards: # loop through and find max_val
                                 if intended_attacks[0][index][1] > max_val[1]:
                                     max_val = [index,intended_attacks[0][index][1]]
-            #                        print("max val after change in array")
-            #                        print(max_val)
-                                # now loop through and find the maximum 
 
-                            
-                            self.defensive_moves[pos] = max_val
-            #                print("defensive moves after changes")
-            #                pprint.pprint(self.defensive_moves)
+                            self.defensive_moves[pos] = max_val # why use this attribute? It's confusing - why not something new like attack with defense move
 
-                        
-                        elif type(intended_attacks) == is_dict:
-                            # get max and divide by appropriate value 
-            #                print("intended_attacks dict case",intended_attacks)
+
+                        elif type(intended_attacks) == is_dict: 
                             inv_cards = list(intended_attacks.keys())
-            #                print("inv cards dict",inv_cards)
                             division_factor = intended_attacks[inv_cards[0]][1] # define division factor (how many poles to divide by)
-            #                print("division factor", division_factor)
 
                             max_val = [inv_cards[0],intended_attacks[inv_cards[0]][0]]
-            #                print("max val dict case")
+
 
                             # loop through and get max
                             first_highest = True
                             for index in inv_cards:
                                 if intended_attacks[index][0] > intended_attacks[inv_cards[0]][0]:
                                     first_highest = False
-            #                        print("checking dict max val value",intended_attacks[index][0])
-            #                        print("checking division factor",division_factor)
-            #                        print("checking calculation",intended_attacks[index][0]/division_factor)
                                     max_val = [index, intended_attacks[index][0]/division_factor] # divide by divsion factor
                             
                             if first_highest:
@@ -934,21 +837,12 @@ class CPU():
                                    
 
                             self.defensive_moves[pos] = max_val
-            #                print("defensive moves after changes in dict case")
-            #                pprint.pprint(self.defensive_moves)
-                             
-
-                    # play the appropriate card and revert defensive_moves and possible_moves to {}                 
-            #        print("making top pick from attacks")
-
 
                     positions = list(self.defensive_moves.keys())
 
                     top_pick= self.defensive_moves[positions[0]][1]
                     selection = {positions[0]: self.defensive_moves[positions[0]]}
 
-            #        print("top_pick",top_pick)
-            #        print("selection",selection)
 
                     for pos in positions:
                         if self.defensive_moves[pos][1] > top_pick:
@@ -957,34 +851,37 @@ class CPU():
                         
                     position_list = list(selection.keys())
                     position = position_list[0]
-            #        print("position",position)
+
                     
                     card_index = selection[position][0]
-            #        print("card_index",card_index)
+
                     card = self.inventory[selection[position][0]]
-            #        print("card",card)
-            #
+
                     # play the card 
-            #        print(self.board.ret_board_in_play())
+
                     self.play_card(position,card,card_index)
-            #        print(self.board.ret_board_in_play())
-            #
+
+
                     # revert defensive_moves to {}
                     self.defensive_moves = {}
  
 
-            # In the event of no availabe attacks 
+            # In the event of no available attacks 
             else: #
                 print()
-                print()
-            #    print("manually checking defensive methods")
+                print("No attacks available - making a defensive move")
+                print("attack_options", attack_options)
 
-                for option in attack_options:
-            #        print(option)
-                    self.defensive_map[option](self.inventory)
+                # change this 
+                for option in attack_options: # what the hell is this? - attack options!? - we have none 
+                    self.defensive_map[option](self.inventory) # defensive moves populated here - no inventory left - that's why !!!!!!!!!!
 
-            #    print("printing defensive sitrep")
-            #    pprint.pprint(self.defensive_moves)
+                #for option in self.spaces_in_play:
+                #    self.defensive_map[option](self.inventory)
+
+                print("defensive_moves priot to POI")
+                pprint.pprint(self.defensive_moves)
+
 
                 POI = list(self.defensive_moves.keys()) # positions of interest for attack/defense
 
@@ -995,8 +892,6 @@ class CPU():
                 for pos in POI: 
                     # can have up to three positions to sum
                     section = self.defensive_moves[pos] # each position 
-            #        print(pos,"section",section) 
-            #        print(type(section))
 
                     # if section.length() > 1
                     if len(section) > 1:
@@ -1014,8 +909,7 @@ class CPU():
 
                             for index in inv_cards:
                                 sum_dispar = [dict_1[index][1] + dict_1[index][2][1], abs(dict_1[index][1] - dict_1[index][2][1])] # calculate sum and disparity
-            #                    print("sum_dispar",sum_dispar)
-                                dict_1[index] = [sum_dispar[0] - sum_dispar[1],2] # sum - disparity is ther ultimate winner - highest sum and lowest disparity is the best card - alos add division factor
+                                dict_1[index] = [sum_dispar[0] - sum_dispar[1],2] # sum - disparity 
 
                         if len(section) == 3:
                             dict_2 = section[1] # define the second dictionary
@@ -1026,9 +920,6 @@ class CPU():
 
                             for index in inv_cards:
                                 dict_1[index].append(dict_3.get(index, {})) # add all of the dictionaries together one after the other 
-                            
-            #                print("checking dict 1 in a 3 pole situation")
-            #                pprint.pprint(dict_1)
 
                             # initially need to find the highest and lowest end member poles for calculations
                             # for index in inv_cards:
@@ -1039,7 +930,6 @@ class CPU():
                                 # calc sum - disparity  
                             for index in inv_cards:
                                 pole_values = [dict_1[index][1], dict_1[index][2][1], dict_1[index][3][1]]
-            #                    print("pole_values", pole_values) 
                                 max_pole = max(pole_values)
                                 min_pole = min(pole_values)
                                 disparity = max_pole - min_pole
@@ -1051,27 +941,25 @@ class CPU():
                         
                         concatenated_positions[pos] = dict_1
 
-            #    print("concatenated_positions for defesnive only")
-            #    pprint.pprint(concatenated_positions)
 
                 for pos in concatenated_positions.keys():
                     self.defensive_moves[pos]  = concatenated_positions[pos] 
 
-            #    print("self.defensive_moves after the change")
-
-            #    pprint.pprint(self.defensive_moves)
-
                 is_list = type([])
                 is_dict = type({})
-            #    print("is_list",is_list)
-            #    print("is_dict",is_dict)
 
+                # here there's likely an meoty array or two - is this erroneous - or should we just remove them? 
+
+                print("checking 1079 - self.defensive_moves - just before checks")
+                pprint.pprint(self.defensive_moves)
                 for pos in self.defensive_moves.keys():
                     # loop through the intended positions to attack
-                    intended_attacks = self.defensive_moves[pos] # aka section from above - will need to refactor all this significantly - lots of redundant code in this method
-                    if type(intended_attacks) == is_list:
+                    intended_attacks = self.defensive_moves[pos] # consider refactor
+                    if type(intended_attacks) == is_list and intended_attacks != []:
                         # get max 
             #            print("intended_attacks single array case",intended_attacks)
+                        print("error 1079 - some positions are empty for defensive moves positions - why - how is it built - does it get edited along the way? ")
+                        print(intended_attacks)
                         inv_cards = list(intended_attacks[0].keys())
             #            print("inv_cards",inv_cards)
                         #max_val = {inv_cards[0]:intended_attacks[inv_cards[0]]} # need to get this right
@@ -1095,11 +983,14 @@ class CPU():
 
                     
                     elif type(intended_attacks) == is_dict:
+                        #print("intended_attacks in division factor error checks")
+                        #print(intended_attacks)
                         # get max and divide by appropriate value 
             #            print("intended_attacks dict case",intended_attacks)
                         inv_cards = list(intended_attacks.keys())
             #            print("inv cards dict",inv_cards)
                         division_factor = intended_attacks[inv_cards[0]][1] # define division factor (how many poles to divide by)
+                        #print("checking division factor and type", division_factor, type(division_factor))
             #            print("division factor", division_factor)
 
                         max_val = [inv_cards[0],intended_attacks[inv_cards[0]][0]]
@@ -1116,7 +1007,8 @@ class CPU():
                                 max_val = [index, intended_attacks[index][0]/division_factor] # divide by divsion factor
                         
                         if first_highest:
-                            max_val = [inv_cards[0],intended_attacks[inv_cards[0]][0]/division_factor] # still need to divide the entry if the first is highest
+                            #print("checking first_highest case and what's being divided and it's type", intended_attacks[inv_cards[0]][0], type(intended_attacks[inv_cards[0]][0]))
+                            max_val = [inv_cards[0],intended_attacks[inv_cards[0]][1]/division_factor] # still need to divide the entry if the first is highest
                                
 
                         self.defensive_moves[pos] = max_val
@@ -1127,42 +1019,61 @@ class CPU():
                 # play the appropriate card and revert defensive_moves and possible_moves to {}                 
         #        print("***making top pick for defense***")
 
+                ########
 
+                print("reached defense in no attack situation")
+                pprint.pprint(self.defensive_moves)
                 positions = list(self.defensive_moves.keys())
 
-                top_pick= self.defensive_moves[positions[0]][1]
+                top_pick= 0
                 selection = {positions[0]: self.defensive_moves[positions[0]]}
+                best_card = False   
 
         #        print("top_pick",top_pick)
         #        print("selection",selection)
 
                 for pos in positions:
-                    if self.defensive_moves[pos][1] > top_pick:
-                        top_pick = self.defensive_moves[pos][1]
-                        selection = {pos:self.defensive_moves[pos]}
+                    if self.defensive_moves[pos] != []: # change here to accomodate empty list 
+                        if self.defensive_moves[pos][1] > top_pick:
+                            top_pick = self.defensive_moves[pos][1]
+                            selection = {pos:self.defensive_moves[pos]}
+                            best_card = True 
+                            
+                if best_card: 
+                    position_list = list(selection.keys())
+                    position = position_list[0]
+            #        print("position",position)
                     
-                position_list = list(selection.keys())
-                position = position_list[0]
-        #        print("position",position)
-                
-                card_index = selection[position][0]
-        #        print("card_index",card_index)
-                card = self.inventory[selection[position][0]]
-        #        print("card",card)
-        #
-                # play the card 
-        #        print(self.board.ret_board_in_play())
-                self.play_card(position,card,card_index)
-        #        print(self.board.ret_board_in_play())
-        #
-                # revert defensive_moves to {}
-                self.defensive_moves = {}
+                    #need to play last card here !!!!
+                    
+                    card_index = selection[position][0]
+            #        print("card_index",card_index)
+                    card = self.inventory[selection[position][0]]
+            #        print("card",card)
+            #
+                    # play the card 
+            #        print(self.board.ret_board_in_play())
+                    self.play_card(position,card,card_index)
+            #        print(self.board.ret_board_in_play())
+            #
+                    # revert defensive_moves to {}
+                    self.defensive_moves = {}
+                else: 
+                    position = positions[0]
+                    card = self.inventory[0]
+                    card_index = 0
+
+                    self.play_card(position,card,card_index)
+
 
                 
 
     def defensive_opener(self):
         ''' if the CPU plays first it plays a defensive move in one of the four corners (least exposed poles)
         biggest sum is played - with an inclusion of disparity to reduce imbalance eg 9 exposed along with a 2'''
+
+        print("defensive opener invoked")
+
         corners= ['pos_0','pos_2','pos_6','pos_8']
         
         for option in corners:
@@ -1175,7 +1086,8 @@ class CPU():
         sum_disparity = {} # card 
 
         for option in corners:
-            pos_0 = self.defensive_moves[option] # loop through each   
+            pos_0 = self.defensive_moves[option] # loop through each  
+ 
 
             pos_0_dict_1 = pos_0[0] 
             pos_0_dict_2 = pos_0[1]
@@ -1245,8 +1157,9 @@ class CPU():
         self.play_card(position,card,card_index)
         #print(self.board.ret_board_in_play())
 #
-        # revert defensive_moves to {}
+        # revert defensive_moves to {} and is_board_empty = False
         self.defensive_moves = {}
+        self.is_board_empty = False
 
 
     def pos_0_attack(self):
@@ -2153,56 +2066,159 @@ class CPU():
 
 # create a loop to run test games 
 
-# instantiations
-deck = Deck() 
-board = Board()
-blue_player = Player(board)
-red_player = CPU(board)
+#deck = Deck() 
+#board = Board()
+#blue_player = CPU(board)
+#red_player = CPU(board)
 
-# deal to CPU and player 
-deck.deal_to_player(blue_player)
-deck.deal_to_player(red_player)
+
 
 #board.state_of_board()
-while board.spaces_filled < 9:
-    pprint.pprint(board.ret_board_in_play())
+def play_game():
+        # instantiations
+    deck = Deck() 
+    board = Board()
+    blue_player = Player(board)
+    red_player = CPU(board)
+
+    # deal to CPU and player 
+    deck.deal_to_player(blue_player)
+    deck.deal_to_player(red_player)
+
+    while board.spaces_filled < 9:
+        pprint.pprint(board.ret_board_in_play())
 
 
-    print("blue Player score",board.blue_score)
-    print("red CPU score",board.red_score)
+        print("blue Player score",board.blue_score)
+        print("red CPU score",board.red_score)
 
-    print("red inv")
-    red_player.show_inventory()
-    print("blue_inv")
-    blue_player.show_inventory()
+        print("red inv")
+        red_player.show_inventory()
+        print("blue_inv")
+        blue_player.show_inventory()
 
-    player_input = input("play card in format inv_card, pos:  ")
+        player_input = input("play card in format inv_card, pos:  ")
 
-    # cards to be played here 
-    # extract message 
-    card_pos = player_input.split(',')
-    position = card_pos[0]
-    index = int(card_pos[1])
-    card = blue_player.inventory[index]
+        # cards to be played here 
+        # extract message 
+        card_pos = player_input.split(',')
+        position = card_pos[0]
+        index = int(card_pos[1])
+        card = blue_player.inventory[index]
 
 
-    blue_player.play_card(position,card,index)
+        blue_player.play_card(position,card,index)
 
-    pprint.pprint(board.ret_board_in_play())
+        pprint.pprint(board.ret_board_in_play())
 
-    print("red inv")
-    red_player.show_inventory()
-    print("blue_inv")
-    blue_player.show_inventory()
+        print("red inv")
+        red_player.show_inventory()
+        print("blue_inv")
+        blue_player.show_inventory()
 
-    # then red player plays 
-    red_player.make_move()
+        # then red player plays 
+        red_player.make_move()
 
-if board.blue_score > board.red_score:
-    print("You win")
-else:
-    print("You lose human, CPU wins!")
+    if board.blue_score > board.red_score:
+        print("You win")
+    else:
+        print("You lose human, CPU wins!")
 
+def play_game_red_first():
+        # instantiations
+    deck = Deck() 
+    board = Board()
+    blue_player = Player(board)
+    red_player = CPU(board)
+
+    # deal to CPU and player 
+    deck.deal_to_player(blue_player)
+    deck.deal_to_player(red_player)
+
+    while board.spaces_filled < 9:
+        # then red player plays 
+        red_player.make_move()
+
+
+
+        pprint.pprint(board.ret_board_in_play())
+
+
+        print("blue Player score",board.blue_score)
+        print("red CPU score",board.red_score)
+
+        print("red inv")
+        red_player.show_inventory()
+        print("blue_inv")
+        blue_player.show_inventory()
+
+        player_input = input("play card in format inv_card, pos:  ")
+
+        # cards to be played here 
+        # extract message 
+        card_pos = player_input.split(',')
+        position = card_pos[0]
+        index = int(card_pos[1])
+        card = blue_player.inventory[index]
+
+
+        blue_player.play_card(position,card,index)
+
+        pprint.pprint(board.ret_board_in_play())
+
+        print("red inv")
+        red_player.show_inventory()
+        print("blue_inv")
+        blue_player.show_inventory()
+
+
+
+    if board.blue_score > board.red_score:
+        print("You win")
+    else:
+        print("You lose human, CPU wins!")
+
+#deck = Deck() 
+#board = Board()
+#blue_player = CPU(board)
+#red_player = CPU(board)
+
+'''
+
+def cpu_v_cpu():
+    # instantiations
+
+
+    # deal to CPU and player 
+    deck.deal_to_player(blue_player)
+    deck.deal_to_player(red_player)
+
+    while board.spaces_filled < 9:
+        
+        pprint.pprint(board.ret_board_in_play())
+
+        print("red inv")
+        red_player.show_inventory()
+        print("blue_inv")
+        blue_player.show_inventory()
+
+
+
+        # then red player plays 
+        red_player.make_move()
+        blue_player.make_move()
+
+        pprint.pprint(board.ret_board_in_play())
+
+        print("red inv")
+        red_player.show_inventory()
+        print("blue_inv")
+        blue_player.show_inventory()
+
+'''
+#cpu_v_cpu()
+play_game()
+#play_game_red_first()
 
 
 
@@ -2323,6 +2339,3 @@ else:
 #print(board.ret_board_in_play())
 
 #print("Inventory before")
-
-
-

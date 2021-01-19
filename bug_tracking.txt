@@ -1,3 +1,219 @@
+===========================================
+OPEN
+===========================================
+
+
+error 1079 
+--------------------------------
+
+- some are empty lists with no entries therein - this ties in with the cant place card here bug - 
+
+- so I think its happening because we've run out of inventory - need to address this first - priority one 
+
+red inv
+blue_inv
+CPU assessinng board
+
+checking empty == self.board.get_spaces_filled() - that looks weird to me already
+3
+board not empty, searching for attacks
+
+
+No attacks available - making a defensive move
+checking 1079 - self.defensive_moves - just before checks
+{'pos_0': [],
+ 'pos_1': [],
+ 'pos_2': [],
+ 'pos_3': [],
+ 'pos_4': [],
+ 'pos_5': [],
+ 'pos_6': [],
+ 'pos_7': [],
+ 'pos_8': []}
+error 1079 - some positions are empty for defensive moves positions - why - how is it built - does it get edited along the way? 
+[]
+Traceback (most recent call last):
+  File "/Users/user1/Documents/triple_triad_py3/tt.py", line 2184, in <module>
+    cpu_v_cpu()
+  File "/Users/user1/Documents/triple_triad_py3/tt.py", line 2173, in cpu_v_cpu
+    red_player.make_move()
+  File "/Users/user1/Documents/triple_triad_py3/tt.py", line 942, in make_move
+    inv_cards = list(intended_attacks[0].keys())
+IndexError: list index out of range
+
+
+
+
+No attacks available - making a defensive move
+checking 1079 - self.defensive_moves - just before checks
+{'pos_0': [{0: ['south_defense', 5],
+            1: ['south_defense', 2],
+            2: ['south_defense', 4]}],
+ 'pos_1': {0: [8, 2], 1: [4, 2], 2: [2, 2]},
+ 'pos_2': [], 
+ 'pos_3': {0: [14, 2], 1: [4, 2], 2: [10, 2]},
+ 'pos_4': {0: [8, 2], 1: [4, 2], 2: [2, 2]},
+ 'pos_5': [{0: ['west_defense', 4],
+            1: ['west_defense', 6],
+            2: ['west_defense', 1]}],
+ 'pos_7': [{0: ['north_defense', 7],
+            1: ['north_defense', 2],
+            2: ['north_defense', 5]}],
+ 'pos_8': [{0: ['west_defense', 4],
+            1: ['west_defense', 6],
+            2: ['west_defense', 1]}]}
+error 1079 - some positions are empty for defensive moves positions - why - how is it built - does it get edited along the way? 
+[{0: ['south_defense', 5], 1: ['south_defense', 2], 2: ['south_defense', 4]}]
+
+- in some cases they're all empty !?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+red inv
+{'north': 1, 'east': 2, 'south': 3, 'west': 4}
+blue_inv
+{'north': 6, 'east': 9, 'south': 2, 'west': 3}
+{'north': 8, 'east': 5, 'south': 1, 'west': 4}
+play card in format inv_card, pos:  pos_8,0
+{'pos_0': [<__main__.Card object at 0x10183c5d0>,
+           {'east': 7, 'north': 3, 'south': 9, 'west': 8},
+           'blue'],
+ 'pos_1': [<__main__.Card object at 0x10183c650>,
+           {'east': 5, 'north': 5, 'south': 9, 'west': 2},
+           'red'],
+ 'pos_2': [<__main__.Card object at 0x10183c950>,
+           {'east': 3, 'north': 3, 'south': 6, 'west': 9},
+           'red'],
+ 'pos_3': [<__main__.Card object at 0x10183c750>,
+           {'east': 5, 'north': 6, 'south': 2, 'west': 4},
+           'red'],
+ 'pos_4': [<__main__.Card object at 0x10183c410>,
+           {'east': 5, 'north': 2, 'south': 5, 'west': 2},
+           'red'],
+ 'pos_5': ['empty', 'no_values'],
+ 'pos_6': [<__main__.Card object at 0x10183c610>,
+           {'east': 6, 'north': 7, 'south': 3, 'west': 3},
+           'blue'],
+ 'pos_7': [<__main__.Card object at 0x1015dfa90>,
+           {'east': 7, 'north': 4, 'south': 4, 'west': 9},
+           'red'],
+ 'pos_8': [<__main__.Card object at 0x10183c550>,
+           {'east': 9, 'north': 6, 'south': 2, 'west': 3},
+           'blue']}
+red inv
+{'north': 1, 'east': 2, 'south': 3, 'west': 4}
+blue_inv
+{'north': 8, 'east': 5, 'south': 1, 'west': 4}
+
+checking empty == self.board.get_spaces_filled() - that looks weird to me already
+8
+checking why this boolean for is_board_emoty is causing late game defensive_opener calls
+False
+board not empty, searching for attacks
+
+
+
+Traceback (most recent call last):
+  File "/Users/user1/Documents/triple_triad_py3/tt.py", line 2318, in <module>
+    play_game_red_first()
+  File "/Users/user1/Documents/triple_triad_py3/tt.py", line 2243, in play_game_red_first
+    red_player.make_move()
+  File "/Users/user1/Documents/triple_triad_py3/tt.py", line 1079, in make_move
+    inv_cards = list(intended_attacks[0].keys())
+IndexError: list index out of range
+
+output: 
+
+error 1079
+[]
+
+intended_attacks is an empty array 
+
+
+
+--------------------
+
+
+intended_attacks in division factor error checks
+{0: [6, 3], 1: [9, 3], 2: [4, 3], 3: [15, 3]}
+intended_attacks in division factor error checks
+{0: [4, 2], 1: [6, 2], 2: [2, 2], 3: [10, 2]}
+intended_attacks in division factor error checks
+{0: [8, 2], 1: [6, 2], 2: [14, 2], 3: [10, 2]}
+intended_attacks in division factor error checks
+{0: ['north_defense', 8], 1: ['north_defense', 5], 2: ['north_defense', 9], 3: ['north_defense', 7]}
+intended_attacks in division factor error checks
+{0: [6, 3], 1: [11, 3], 2: [4, 3], 3: [16, 3]}
+intended_attacks in division factor error checks
+{0: [8, 2], 1: [6, 2], 2: [14, 2], 3: [10, 2]}
+intended_attacks in division factor error checks
+{0: [8, 2], 1: [6, 2], 2: [14, 2], 3: [10, 2]}
+intended_attacks in division factor error checks
+{0: [4, 2], 1: [6, 2], 2: [4, 2], 3: [12, 2]}
+{'pos_0': ['empty', 'no_values'],
+ 'pos_1': ['empty', 'no_values'],
+ 'pos_2': ['empty', 'no_values'],
+ 'pos_3': ['empty', 'no_values'],
+ 'pos_4': ['empty', 'no_values'],
+ 'pos_5': ['empty', 'no_values'],
+ 'pos_6': [<__main__.Card object at 0x10f50e910>,
+           {'east': 8, 'north': 8, 'south': 5, 'west': 2},
+           'red'],
+ 'pos_7': ['empty', 'no_values'],
+ 'pos_8': [<__main__.Card object at 0x10f50e5d0>,
+           {'east': 5, 'north': 7, 'south': 5, 'west': 6},
+           'red']}
+blue Player score 5
+red CPU score 5
+red inv
+{'north': 8, 'east': 4, 'south': 2, 'west': 2}
+{'north': 5, 'east': 3, 'south': 5, 'west': 3}
+{'north': 9, 'east': 7, 'south': 1, 'west': 2}
+blue_inv
+{'north': 5, 'east': 4, 'south': 8, 'west': 1}
+{'north': 7, 'east': 9, 'south': 8, 'west': 9}
+{'north': 7, 'east': 6, 'south': 1, 'west': 1}
+{'north': 3, 'east': 5, 'south': 8, 'west': 2}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Test runs of the game via manual testing 
 Remember to enter the card configurations/inventory when the error occured 
 
@@ -8,6 +224,11 @@ Description:
 CPU for some reason is attempting to play in spaces where the board is already occupied with a card 
 
 When does this occur: 
+
+reached defense in no attack situation - gets to defense 
+
+it doesnt have an up tpo date register of what spaces are filled 
+This space is full, you can't place a card over another card
 
 
 
@@ -66,3 +287,85 @@ Traceback (most recent call last):
 IndexError: list index out of range
 
 ---------------------------------------
+
+
+
+
+===========================================
+RESOLVED
+===========================================
+division_factor error - resolved -indexing was wrong - taking 'north_defense' str rather than the value for same
+
+checking division factor and type 2 <class 'int'>
+checking division factor and type 2 <class 'int'>
+checking division factor and type 3 <class 'int'>
+checking first_highest case and what's being divided and it's type north_defense <class 'str'>
+Traceback (most recent call last):
+  File "/Users/user1/Documents/triple_triad_py3/tt.py", line 2247, in <module>
+    cpu_v_cpu()
+  File "/Users/user1/Documents/triple_triad_py3/tt.py", line 2238, in cpu_v_cpu
+    blue_player.make_move()
+  File "/Users/user1/Documents/triple_triad_py3/tt.py", line 1121, in make_move
+    max_val = [inv_cards[0],intended_attacks[inv_cards[0]][0]/division_factor] # still need to divide the entry if the first is highest
+TypeError: unsupported operand type(s) for /: 'str' and 'int'
+
+north_defense clearly isn't the int we're looking for 
+
+-----------------------------
+
+line 625 - list index out of range IndexError - resolved - after defensive opener is invoked set is board Empty back to False
+
+red inv
+{'north': 6, 'east': 1, 'south': 6, 'west': 3}
+{'north': 6, 'east': 2, 'south': 2, 'west': 9}
+{'north': 4, 'east': 2, 'south': 3, 'west': 3}
+blue_inv
+{'north': 8, 'east': 1, 'south': 2, 'west': 8}
+{'north': 6, 'east': 1, 'south': 6, 'west': 3}
+{'north': 8, 'east': 4, 'south': 3, 'west': 7}
+{'pos_0': ['empty', 'no_values'],
+ 'pos_1': ['empty', 'no_values'],
+ 'pos_2': [<__main__.Card object at 0x102c985d0>,
+           {'east': 2, 'north': 4, 'south': 3, 'west': 3},
+           'red'],
+ 'pos_3': ['empty', 'no_values'],
+ 'pos_4': ['empty', 'no_values'],
+ 'pos_5': [<__main__.Card object at 0x102c98610>,
+           {'east': 2, 'north': 6, 'south': 2, 'west': 9},
+           'red'],
+ 'pos_6': ['empty', 'no_values'],
+ 'pos_7': ['empty', 'no_values'],
+ 'pos_8': [<__main__.Card object at 0x102c98910>,
+           {'east': 1, 'north': 8, 'south': 2, 'west': 8},
+           'red']}
+red inv
+{'north': 6, 'east': 1, 'south': 6, 'west': 3}
+{'north': 6, 'east': 2, 'south': 2, 'west': 9}
+{'north': 4, 'east': 2, 'south': 3, 'west': 3}
+blue_inv
+{'north': 8, 'east': 1, 'south': 2, 'west': 8}
+{'north': 6, 'east': 1, 'south': 6, 'west': 3}
+{'north': 8, 'east': 4, 'south': 3, 'west': 7}
+
+spaces in play in assess board
+{'pos_0': ['empty', 'no_values'], 'pos_1': ['empty', 'no_values'], 'pos_2': ['empty', 'no_values'], 'pos_3': ['empty', 'no_values'], 'pos_4': ['empty', 'no_values'], 'pos_5': ['empty', 'no_values'], 'pos_6': ['empty', 'no_values'], 'pos_7': ['empty', 'no_values'], 'pos_8': ['empty', 'no_values']}
+Traceback (most recent call last):
+  File "/Users/user1/Documents/triple_triad_py3/tt.py", line 2249, in <module>
+    cpu_v_cpu()
+  File "/Users/user1/Documents/triple_triad_py3/tt.py", line 2239, in cpu_v_cpu
+    red_player.make_move()
+  File "/Users/user1/Documents/triple_triad_py3/tt.py", line 625, in make_move
+    self.defensive_opener() 
+  File "/Users/user1/Documents/triple_triad_py3/tt.py", line 1185, in defensive_opener
+    pos_0_dict_2 = pos_0[1]
+IndexError: list index out of range
+
+-- this is very strange - this is going to defensive_opener - it shouldn't be 
+so that boolean is not working correctly 
+
+-- is this a problem though 
+-- its the cpu playing against the cpu - will it crop up against another player 
+- verified that it does 
+- this is priority 1 now to get this resolved
+
+------------------
