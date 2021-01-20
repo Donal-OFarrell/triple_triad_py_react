@@ -228,8 +228,12 @@ class Board():
         if self.positions['pos_0'][0] != 'empty':
             if self.positions['pos_0'][0].get_colour() != self.positions['pos_1'][0].get_colour():
                 if self.positions['pos_1'][0].get_west() > self.positions['pos_0'][0].get_east():
+                    
                     print("1 fighting 0")
-                    self.positions['pos_0'][0].set_colour(self.positions['pos_1'][0].get_colour()) # flip the card to attacking cards colour 
+                    self.positions['pos_0'][0].set_colour(self.positions['pos_1'][0].get_colour()) # flip the card to attacking cards colour
+                    # carry out score changes 
+                    print("winning_colour", self.positions['pos_1'][0].get_colour())
+                    self.adjust_scores(self.positions['pos_1'][0].get_colour()) 
 
 
                     print("1 flipped 0")
@@ -683,7 +687,10 @@ class CPU():
                 valid_attack_keys = list(valid_attacks.keys())
 
                 for position in valid_attack_keys:
-                    self.defensive_map[position](self.inventory) # this should invoke the method - which should then popluate defensive_moves
+                    self.defensive_map[position](self.inventory) # this should invoke the method - which should then popluate defensive_moves 
+                    #### I think here we just pass the relevant inventory for each position 
+                    #### verify that indices hold true 
+                    #### if not may need to invoke ids for the cards 
 
                 print("checking for attack with no defensive considerations thereafter - prioritise these")
                 pos_to_attack = '' # the position to attack in the case of no defense to consider 
@@ -702,7 +709,7 @@ class CPU():
 
                     power_of_lowest = lowest_power_card[0]
 
-                    no_def_attack = {pos_to_attack:''} # placeholder for the position of the ventual card to attack 
+                    no_def_attack = {pos_to_attack:''} # placeholder for the position of the eventual card to attack 
 
                     for card in card_keys:
                         if valid_attacks[pos_to_attack][card][0] < power_of_lowest:
@@ -730,9 +737,20 @@ class CPU():
                     # I think this should be valid attacks 
                     print("valid_attacks", valid_attacks)
                     print("POI", POI)
+                    print("self.defensive_moves")
+                    pprint.pprint(self.defensive_moves)
+
+                    # need to repopulate defensive moves here from valid attacks 
+                    # so you could just loop through and drop the invalid keys 
+
+                    for pos in POI:
+                        valid_attack_inv_cards = list(valid_attacks[pos].keys()) # these are the valid keys 
+                        print("valid_attack_inv_cards", valid_attack_inv_cards)
+                        # need to drop all invalid keys from self.defensive_moves
 
                     # poi then needs the cards that can produce flips 
                     # self.defensive_map[pos](inv_cards that can produce a flip)
+                    #### I think here we just pass the relevant inventory for each position
 
                     sections = []
 
@@ -792,6 +810,9 @@ class CPU():
                     for pos in concatenated_positions.keys():
                         self.defensive_moves[pos]  = concatenated_positions[pos] 
 
+                    # process here maybe? 
+                    print("self.defensive_moves after initial processing")
+                    pprint.pprint(self.defensive_moves)
 
                     # if type(self.defensive_moves) 
                     #  is_list = then you take the max of the poles 
@@ -807,7 +828,9 @@ class CPU():
                         if type(intended_attacks) == is_list:
                             # get max 
 
-                            inv_cards = list(intended_attacks[0].keys())
+                            #inv_cards = list(intended_attacks[0].keys())
+                            # what about here????????????
+                            inv_cards = list(valid_attacks[pos].keys()) # these are the valid keys
 
                             max_val = [inv_cards[0],intended_attacks[0][inv_cards[0]][1]] # intitiate max_val variable 
                             
@@ -819,7 +842,8 @@ class CPU():
 
 
                         elif type(intended_attacks) == is_dict: 
-                            inv_cards = list(intended_attacks.keys())
+                            #inv_cards = list(intended_attacks.keys())
+                            inv_cards = list(valid_attacks[pos].keys()) # these are the valid keys
                             division_factor = intended_attacks[inv_cards[0]][1] # define division factor (how many poles to divide by)
 
                             max_val = [inv_cards[0],intended_attacks[inv_cards[0]][0]]
@@ -873,7 +897,7 @@ class CPU():
                 print("attack_options", attack_options)
 
                 # change this 
-                for option in attack_options: # what the hell is this? - attack options!? - we have none 
+                for option in attack_options:  
                     self.defensive_map[option](self.inventory) # defensive moves populated here - no inventory left - that's why !!!!!!!!!!
 
                 #for option in self.spaces_in_play:
@@ -2116,8 +2140,9 @@ def play_game():
         print("blue_inv")
         blue_player.show_inventory()
 
-        # then red player plays 
-        red_player.make_move()
+        if board.spaces_filled != 8:
+            # then red player plays  
+            red_player.make_move()
 
     if board.blue_score > board.red_score:
         print("You win")
