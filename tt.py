@@ -2140,7 +2140,7 @@ def play_game():
         print("blue_inv")
         blue_player.show_inventory()
 
-        if board.spaces_filled != 8:
+        if board.spaces_filled != 9:
             # then red player plays  
             red_player.make_move()
 
