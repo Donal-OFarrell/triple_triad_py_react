@@ -729,12 +729,13 @@ class CPU():
                     no_def_card = self.inventory[no_def_card_index]
 
                     self.play_card(no_def_pos,no_def_card,no_def_card_index) # play no defense attacking card if available 
+                    print("played a card with no defensive considerations")
 
 
                    
                 # else pick the card with the best defesne - ie an attack that has a defensive consequence on the next turn 
                 else: # there are no defense free attacks 
-                    print("arrived at attacks with defensive considerations")
+                    print("no defense free attacks found, arrived at attacks with defensive considerations")
 
                     POI = list(self.defensive_moves.keys()) # positions of interest for attack/defense 
 
@@ -2057,7 +2058,16 @@ def play_game():
         blue_player.show_inventory()
 
         if board.spaces_filled != 9:
-            # then red player plays  
+            # then red player plays 
+            # reprint state of game 
+            print("blue Player score",board.blue_score)
+            print("red CPU score",board.red_score)
+
+            print("red inv")
+            red_player.show_inventory()
+            print("blue_inv")
+            blue_player.show_inventory() 
+
             red_player.make_move()
 
     if board.blue_score > board.red_score:
@@ -2123,6 +2133,9 @@ def play_game_red_first():
 #board = Board()
 #blue_player = CPU(board)
 #red_player = CPU(board)
+
+
+play_game()
 
 '''
 
