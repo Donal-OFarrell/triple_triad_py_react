@@ -19,5 +19,12 @@ def onLoadCpuCardData(request):
     # -> and return 
     return HttpResponse(five_cards) 
 
-
-
+"""
+def processPlayerMove(request):
+    ''' ingests the board state (cards in their repsctive positions and colours) and the desired move as given position from the player, 
+    plugs this into the app logic 
+    and retruns the outcome i.e. is there a flip, score change etc.'''
+    #data_extract = request.body.decode('utf-8') 
+    #body = json.loads(data_extract)
+    # --> incoming board: pos_1:0
+"""
