@@ -1,0 +1,32 @@
+
+BACKLOG
+--------------------------------------------------------------------------------
+- address id issue on both sides 
+
+- create a player_move card - will accept a ping from the front end with a player deck + intended move + current score 
+-> will return board + score + isflip on any square that needs an animation 
+
+- create a cpu_move method 
+-> will accept board in itc current state + cpu deck + score 
+-> make move will run 
+-> then return oard + score + isflip on any square that needs an animation 
+//////////////////////////////////////////////////////////////////////////////
+IN PROGRESS 
+------------------------------------------------------------------------------
+- create a player_move view 
+-> will accept a ping from the front end with a player deck + intended move + current score 
+-> will return board + score + isflip on any square that needs an animation 
+
+- start a react project 
+-> both need to be worked on in parallel for easiest dev process 
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+RESOLVED 
+--------------------------------------------------------------------------------
+- change card levels to int values  
+--------------------------------------------------------------------------------
+- develop a random onload method to pass over cards from the db in json format for the cpu to use
+--------------------------------------------------------------------------------
+////////////////////////////////////////////////////////////////////////////////
